@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Skraldetømning – udskriv</title>
+  <style>
+    /* ── Reset ─────────────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color:       #1A202C;
+      background:  #fff;
+      padding:     28px;
+      font-size:   10.5pt;
+      line-height: 1.45;
+    }
+
+    /* ── Loading / error ────────────────────────────────────────────────────── */
+    #loading-msg {
+      text-align: center;
+      padding:    48px;
+      font-size:  13pt;
+      color:      #718096;
+    }
+
+    /* ── Print header ───────────────────────────────────────────────────────── */
+    .print-header {
+      display:         flex;
+      justify-content: space-between;
+      align-items:     flex-start;
+      margin-bottom:   20px;
+      padding-bottom:  14px;
+      border-bottom:   3px solid #0D9488;
+    }
+
+    .header-brand {
+      font-size:      19pt;
+      font-weight:    800;
+      letter-spacing: -0.02em;
+    }
+
+    .header-addr {
+      font-size:   10pt;
+      font-weight: 600;
+      color:       #2D3748;
+      margin-top:  5px;
+    }
+
+    .header-meta {
+      text-align:  right;
+      font-size:   8.5pt;
+      color:       #718096;
+      line-height: 1.75;
+    }
+
+    /* ── Two-column layout ──────────────────────────────────────────────────── */
+    .events-container {
+      columns:      2;
+      column-gap:   22px;
+      column-fill:  balance;
+    }
+
+    /* Each month block stays in one column */
+    .month-group {
+      break-inside:  avoid-column;
+      margin-bottom: 18px;
+    }
+
+    .month-header {
+      font-size:      7.5pt;
+      font-weight:    800;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color:          #718096;
+      padding-bottom: 5px;
+      border-bottom:  1.5px solid #E2E8F0;
+      margin-bottom:  6px;
+    }
+
+    /* ── Event rows ─────────────────────────────────────────────────────────── */
+    .event-row {
+      display:       flex;
+      align-items:   center;
+      gap:           8px;
+      padding:       5px 7px;
+      border-left:   3px solid #CBD5E0; /* overridden via JS */
+      margin-bottom: 3px;
+      break-inside:  avoid;
+    }
+
+    .event-date {
+      flex-shrink: 0;
+      min-width:   26px;
+      text-align:  center;
+    }
+
+    .event-day {
+      display:        block;
+      font-size:      6.5pt;
+      font-weight:    700;
+      color:          #718096;
+      text-transform: uppercase;
+    }
+
+    .event-daynum {
+      display:     block;
+      font-size:   11pt;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .event-badge {
+      display:       inline-flex;
+      align-items:   center;
+      gap:           5px;
+      padding:       2px 9px;
+      border-radius: 999px;
+      font-size:     8.5pt;
+      font-weight:   600;
+      /* bg + color overridden via JS */
+    }
+
+    /* ── Footer ─────────────────────────────────────────────────────────────── */
+    .print-footer {
+      margin-top:   20px;
+      padding-top:  10px;
+      border-top:   1px solid #E2E8F0;
+      font-size:    8pt;
+      color:        #A0AEC0;
+      text-align:   center;
+    }
+
+    /* ── Screen-only hint button ─────────────────────────────────────────────── */
+    .print-hint {
+      position:   fixed;
+      bottom:     20px;
+      right:      20px;
+      background: #0D9488;
+      color:      #fff;
+      padding:    11px 20px;
+      border:     none;
+      border-radius: 9px;
+      font-family:   inherit;
+      font-size:  10pt;
+      font-weight: 700;
+      cursor:     pointer;
+      box-shadow: 0 4px 14px rgba(0,0,0,.22);
+      z-index:    9999;
+      transition: background 0.12s;
+    }
+    .print-hint:hover { background: #0F766E; }
+
+    /* ── Print media query ───────────────────────────────────────────────────── */
+    @page { margin: 1.5cm; size: A4 portrait; }
+
+    @media print {
+      body        { padding: 0; }
+      *           { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .print-hint { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div id="loading-msg">Henter data&hellip;</div>
+
+  <div id="content" style="display:none">
+    <div class="print-header">
+      <div>
+        <div class="header-brand">🗑️ Skraldetømning</div>
+        <div id="header-addr" class="header-addr"></div>
+      </div>
+      <div id="header-meta" class="header-meta"></div>
+    </div>
+
+    <div id="events-container" class="events-container"></div>
+
+    <div id="print-footer" class="print-footer"></div>
+  </div>
+
+  <button class="print-hint" onclick="window.print()">🖨️&nbsp; Udskriv / Gem som PDF</button>
+
+  <script>
+    'use strict';
+
+    const DAYS_SHORT  = ['Søn','Man','Tir','Ons','Tor','Fre','Lør'];
+    const MONTHS_DA   = ['januar','februar','marts','april','maj','juni',
+                         'juli','august','september','oktober','november','december'];
+    const MONTHS_CAP  = ['Januar','Februar','Marts','April','Maj','Juni',
+                         'Juli','August','September','Oktober','November','December'];
+
+    function wasteType(title) {
+      const t = title.toLowerCase();
+      if (t.includes('dagrenovation'))                 return { icon: '🗑️', color: '#94A3B8', bg: '#F1F5F9', fg: '#475569' };
+      if (t.includes('papir'))                         return { icon: '📄', color: '#3B82F6', bg: '#DBEAFE', fg: '#1D4ED8' };
+      if (t.includes('pap'))                           return { icon: '📦', color: '#A16207', bg: '#FEF9C3', fg: '#78350F' };
+      if (t.includes('glas'))                          return { icon: '🍾', color: '#14B8A6', bg: '#CCFBF1', fg: '#134E4A' };
+      if (t.includes('plast') && t.includes('metal'))  return { icon: '♻️', color: '#F59E0B', bg: '#FEF3C7', fg: '#78350F' };
+      if (t.includes('plast'))                         return { icon: '♻️', color: '#FBBF24', bg: '#FEF9C3', fg: '#713F12' };
+      if (t.includes('metal'))                         return { icon: '🔩', color: '#F97316', bg: '#FFEDD5', fg: '#7C2D12' };
+      if (t.includes('haveaffald') || t.includes('have')) return { icon: '🌿', color: '#22C55E', bg: '#DCFCE7', fg: '#14532D' };
+      if (t.includes('madaffald')  || t.includes('mad'))  return { icon: '🍕', color: '#84CC16', bg: '#ECFCCB', fg: '#365314' };
+      if (t.includes('restaffald'))                    return { icon: '⚫', color: '#6B7280', bg: '#F3F4F6', fg: '#374151' };
+      if (t.includes('storskrald'))                    return { icon: '🛋️', color: '#D97706', bg: '#FEF3C7', fg: '#78350F' };
+      if (t.includes('farlig'))                        return { icon: '⚠️', color: '#EF4444', bg: '#FEE2E2', fg: '#991B1B' };
+      return                                                  { icon: '🗓️', color: '#CBD5E0', bg: '#F1F5F9', fg: '#4A5568' };
+    }
+
+    /* Safely set text content to avoid XSS */
+    function txt(el, s) { el.textContent = String(s); }
+
+    function parseLocalDate(dateStr) {
+      const [y, m, d] = dateStr.slice(0, 10).split('-').map(Number);
+      return new Date(y, m - 1, d);
+    }
+
+    function dateLabel(d) {
+      return d.getDate() + '. ' + MONTHS_DA[d.getMonth()] + ' ' + d.getFullYear();
+    }
+
+    async function render() {
+      try {
+        const [datesRes, addrRes] = await Promise.all([
+          fetch('/api/dates'),
+          fetch('/api/saved-address'),
+        ]);
+
+        const dates   = await datesRes.json();
+        const address = await addrRes.json();
+
+        if (!Array.isArray(dates)) {
+          throw new Error(dates.error || 'Uventet svar fra serveren');
+        }
+
+        /* ── Header ─────────────────────────────────────────────────────────── */
+        const addrLabel = address
+          ? (address.navn || '') + (address.postnr ? ', ' + address.postnr : '')
+          : '';
+
+        const now    = new Date();
+        const future = new Date(now);
+        future.setMonth(future.getMonth() + 6);
+
+        txt(document.getElementById('header-addr'), '📍 ' + addrLabel);
+
+        const metaEl = document.getElementById('header-meta');
+        metaEl.innerHTML =
+          'Udskrevet: '   + dateLabel(now)    + '<br>' +
+          'Periode: '     + dateLabel(now)    + ' – ' + dateLabel(future) + '<br>' +
+          'Kilde: vestfor.dk';
+
+        txt(document.getElementById('print-footer'),
+          'Skraldetømningsapp · Data fra vestfor.dk · Genereret ' + dateLabel(now));
+
+        /* ── Group events by month ───────────────────────────────────────────── */
+        const groups = new Map();
+        for (const ev of dates) {
+          const d   = parseLocalDate(ev.start);
+          const key = d.getFullYear() + '-' + d.getMonth();
+          if (!groups.has(key)) {
+            groups.set(key, {
+              label:  MONTHS_CAP[d.getMonth()] + ' ' + d.getFullYear(),
+              events: [],
+            });
+          }
+          groups.get(key).events.push(ev);
+        }
+
+        /* ── Render rows ─────────────────────────────────────────────────────── */
+        const container = document.getElementById('events-container');
+
+        for (const [, { label, events }] of groups) {
+          const mg = document.createElement('div');
+          mg.className = 'month-group';
+
+          const mh = document.createElement('h2');
+          mh.className = 'month-header';
+          txt(mh, label);
+          mg.appendChild(mh);
+
+          for (const ev of events) {
+            const wt  = wasteType(ev.title);
+            const d   = parseLocalDate(ev.start);
+
+            const row = document.createElement('div');
+            row.className = 'event-row';
+            row.style.borderLeftColor = wt.color;
+
+            /* Date column */
+            const dateCol = document.createElement('div');
+            dateCol.className = 'event-date';
+
+            const daySpan = document.createElement('span');
+            daySpan.className = 'event-day';
+            txt(daySpan, DAYS_SHORT[d.getDay()]);
+
+            const numSpan = document.createElement('span');
+            numSpan.className = 'event-daynum';
+            txt(numSpan, d.getDate() + '.');
+
+            dateCol.appendChild(daySpan);
+            dateCol.appendChild(numSpan);
+
+            /* Badge */
+            const badge = document.createElement('span');
+            badge.className = 'event-badge';
+            badge.style.background = wt.bg;
+            badge.style.color      = wt.fg;
+
+            const iconSpan = document.createElement('span');
+            iconSpan.setAttribute('aria-hidden', 'true');
+            txt(iconSpan, wt.icon);
+
+            const titleSpan = document.createElement('span');
+            txt(titleSpan, ev.title);
+
+            badge.appendChild(iconSpan);
+            badge.appendChild(titleSpan);
+
+            row.appendChild(dateCol);
+            row.appendChild(badge);
+            mg.appendChild(row);
+          }
+
+          container.appendChild(mg);
+        }
+
+        /* ── Show + auto-print ───────────────────────────────────────────────── */
+        document.getElementById('loading-msg').style.display = 'none';
+        document.getElementById('content').style.display     = 'block';
+        setTimeout(() => window.print(), 500);
+
+      } catch (err) {
+        const msg = document.getElementById('loading-msg');
+        txt(msg, 'Fejl: ' + err.message);
+      }
+    }
+
+    render();
+  </script>
+</body>
+</html>
