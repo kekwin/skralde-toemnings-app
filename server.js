@@ -102,14 +102,14 @@ async function establishSession(addressId) {
 }
 
 /**
- * Fetch tømmedatoer for the next 6 months.
+ * Fetch tømmedatoer for the next 12 months.
  * Automatically retries once by re-establishing the session if the response
  * is not a valid JSON array (session expired / never set).
  */
 async function fetchTommeDates(retry = true) {
   const now    = new Date();
   const future = new Date(now);
-  future.setMonth(future.getMonth() + 6);
+  future.setFullYear(future.getFullYear() + 1);
 
   const start = now.toISOString().slice(0, 10);
   const end   = future.toISOString().slice(0, 10);
@@ -232,11 +232,17 @@ app.get('/api/calendar.ics', async (req, res) => {
       const month = parseInt(ev.start.slice(5, 7), 10);
       const day   = parseInt(ev.start.slice(8, 10), 10);
       const next  = new Date(year, month - 1, day + 1);
+      const reminder = new Date(year, month - 1, day - 1, 20, 30, 0);
       const ymdt  = [
         next.getFullYear(),
         String(next.getMonth() + 1).padStart(2, '0'),
         String(next.getDate()).padStart(2, '0'),
       ].join('');
+      const reminderAt = [
+        reminder.getFullYear(),
+        String(reminder.getMonth() + 1).padStart(2, '0'),
+        String(reminder.getDate()).padStart(2, '0'),
+      ].join('') + 'T203000';
 
       const uid          = `${ymd}-${ev.title.replace(/\s+/g, '-').toLowerCase()}@skraldetomning`;
       const { icon }     = wasteType(ev.title);
@@ -249,6 +255,11 @@ app.get('/api/calendar.ics', async (req, res) => {
         `SUMMARY:${summary}`,
         `DESCRIPTION:Tømning\\: ${summary}`,
         `UID:${uid}`,
+        'BEGIN:VALARM',
+        'ACTION:DISPLAY',
+        'DESCRIPTION:Påmindelse: Tømning i morgen',
+        `TRIGGER;VALUE=DATE-TIME:${reminderAt}`,
+        'END:VALARM',
         'TRANSP:TRANSPARENT',
         'END:VEVENT'
       );

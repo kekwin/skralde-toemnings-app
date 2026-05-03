@@ -2,6 +2,11 @@
 
 Lokal app der henter tømmedatoer fra Vestfor og viser dem i et overskueligt interface.
 
+## Hvad er nyt
+
+- Appen henter nu tømmedatoer for det næste år.
+- Download af kalenderfil (`/api/calendar.ics`) indeholder nu en påmindelse kl. 20:30 aftenen før hver tømning.
+
 ## Første gang
 
 Åbn en terminal (PowerShell eller CMD) i mappen og kør:

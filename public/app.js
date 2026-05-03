@@ -137,7 +137,7 @@ async function loadDates() {
 // ── Rendering ─────────────────────────────────────────────────────────────────
 function renderDates(dates) {
   if (!dates.length) {
-    datesList.innerHTML = '<p class="empty-msg">Ingen tømninger fundet i de næste 6 måneder.</p>';
+    datesList.innerHTML = '<p class="empty-msg">Ingen tømninger fundet i det næste år.</p>';
     return;
   }
 
