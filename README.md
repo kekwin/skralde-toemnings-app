@@ -5,8 +5,10 @@ Lokal app der henter tømmedatoer fra Vestfor og viser dem i et overskueligt int
 ## Hvad er nyt
 
 - Appen henter nu tømmedatoer for det næste år.
-- Download af kalenderfil (`/api/calendar.ics`) indeholder nu en påmindelse kl. 20:30 aftenen før hver tømning.
+- Download af kalenderfil (`/api/calendar.ics`) laver nu tidsbestemte events kl. 06:00-06:30 på tømmedagen (Europe/Copenhagen).
+- Kalenderfilen indeholder en påmindelse kl. 20:30 aftenen før hver tømning.
 - Kalenderfilen markerer events som ledig tid (free), inkl. Outlook/Microsoft-specifikke felter for bedre import-kompatibilitet.
+- UID i kalenderfilen genereres nu RFC-5545-kompatibelt (uden ugyldige tegn som `/`) for bedre Outlook-import.
 
 ## Første gang
 

@@ -30,6 +30,108 @@ function wasteType(title) {
   return                                                  { icon: '🗓️', color: '#CBD5E0', bg: '#F1F5F9', fg: '#4A5568' };
 }
 
+// Build a stable RFC-5545-safe UID token from event title.
+function uidToken(text) {
+  return String(text || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^[-.]+|[-.]+$/g, '') || 'event';
+}
+
+// ── ICS helpers ─────────────────────────────────────────────────────────────
+
+/**
+ * Fold a single ICS content line at 75 octets per RFC 5545 §3.1.
+ * Continuation lines are prefixed with a single SPACE.
+ */
+function foldLine(line) {
+  const bytes = Buffer.from(line, 'utf8');
+  if (bytes.length <= 75) return line;
+  const parts = [];
+  let offset   = 0;
+  let maxBytes = 75;        // first chunk: 75 octets
+  while (offset < bytes.length) {
+    let end = Math.min(offset + maxBytes, bytes.length);
+    // Back up if we're in the middle of a multi-byte UTF-8 sequence
+    while (end > offset && (bytes[end] & 0xC0) === 0x80) end--;
+    parts.push(bytes.slice(offset, end).toString('utf8'));
+    offset   = end;
+    maxBytes = 74;           // continuation chunks: 74 octets (1 reserved for leading space)
+  }
+  return parts.join('\r\n ');
+}
+
+/**
+ * Build a fully validated ICS string from a list of event objects.
+ * Throws if BEGIN:VEVENT / END:VEVENT counts don't match or
+ * END:VCALENDAR is missing.
+ */
+function buildIcs(events) {
+  const lines = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Skraldetomning//DA',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
+    'X-WR-CALNAME:Skraldetømning',
+    'X-WR-TIMEZONE:Europe/Copenhagen',
+    'BEGIN:VTIMEZONE',
+    'TZID:Europe/Copenhagen',
+    'X-LIC-LOCATION:Europe/Copenhagen',
+    'BEGIN:DAYLIGHT',
+    'TZOFFSETFROM:+0100',
+    'TZOFFSETTO:+0200',
+    'TZNAME:CEST',
+    'DTSTART:19700329T020000',
+    'RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU',
+    'END:DAYLIGHT',
+    'BEGIN:STANDARD',
+    'TZOFFSETFROM:+0200',
+    'TZOFFSETTO:+0100',
+    'TZNAME:CET',
+    'DTSTART:19701025T030000',
+    'RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU',
+    'END:STANDARD',
+    'END:VTIMEZONE',
+  ];
+
+  for (const ev of events) {
+    lines.push(
+      'BEGIN:VEVENT',
+      `UID:${ev.uid}`,
+      `DTSTART;TZID=Europe/Copenhagen:${ev.start}`,
+      `DTEND;TZID=Europe/Copenhagen:${ev.end}`,
+      `SUMMARY:${ev.summary}`,
+      'TRANSP:TRANSPARENT',
+      'X-MICROSOFT-CDO-BUSYSTATUS:FREE',
+      'X-MICROSOFT-CDO-INTENDEDSTATUS:FREE',
+      'BEGIN:VALARM',
+      'TRIGGER:-PT9H30M',
+      'ACTION:DISPLAY',
+      'DESCRIPTION:Tømning i morgen',
+      'END:VALARM',
+      'END:VEVENT',
+    );
+  }
+
+  lines.push('END:VCALENDAR');
+
+  // ── Structural validation ─────────────────────────────────────────────────
+  const begins = lines.filter(l => l === 'BEGIN:VEVENT').length;
+  const ends   = lines.filter(l => l === 'END:VEVENT').length;
+  if (begins !== ends) {
+    throw new Error(`ICS struktur ugyldig: ${begins} BEGIN:VEVENT / ${ends} END:VEVENT`);
+  }
+  if (lines[lines.length - 1] !== 'END:VCALENDAR') {
+    throw new Error('ICS struktur ugyldig: mangler END:VCALENDAR');
+  }
+
+  return lines.map(foldLine).join('\r\n') + '\r\n';
+}
+
 // ── In-memory session state ──────────────────────────────────────────────────
 let sessionCookies  = {};   // { name: value, ... }
 let currentAddressId = null;
@@ -214,64 +316,25 @@ app.get('/api/calendar.ics', async (req, res) => {
   if (!currentAddressId) return res.status(400).send('Ingen adresse valgt');
 
   try {
-    const dates = await fetchTommeDates();
+    const dates  = await fetchTommeDates();
+    const events = dates.map(ev => {
+      const ymd        = ev.start.slice(0, 10).replace(/-/g, '');  // "20250422"
+      const { icon }   = wasteType(ev.title);
+      // RFC 5545 text escaping: backslash, semicolon, comma must be escaped
+      const summary    = `${icon} ${ev.title}`.replace(/[\\;,]/g, '\\$&');
+      return {
+        uid:     `${ymd}-${uidToken(ev.title)}@skraldetomning.local`,
+        start:   `${ymd}T060000`,
+        end:     `${ymd}T063000`,
+        summary,
+      };
+    });
 
-    const lines = [
-      'BEGIN:VCALENDAR',
-      'VERSION:2.0',
-      'PRODID:-//Skraldetomning//DA',
-      'CALSCALE:GREGORIAN',
-      'METHOD:PUBLISH',
-      'X-WR-CALNAME:Skraldetømning',
-    ];
-
-    for (const ev of dates) {
-      // Extract date string directly to avoid timezone drift (e.g. "2025-04-22T00:00:00")
-      const ymd  = ev.start.slice(0, 10).replace(/-/g, '');  // "20250422"
-      const year  = parseInt(ev.start.slice(0, 4), 10);
-      const month = parseInt(ev.start.slice(5, 7), 10);
-      const day   = parseInt(ev.start.slice(8, 10), 10);
-      const next  = new Date(year, month - 1, day + 1);
-      const reminder = new Date(year, month - 1, day - 1, 20, 30, 0);
-      const ymdt  = [
-        next.getFullYear(),
-        String(next.getMonth() + 1).padStart(2, '0'),
-        String(next.getDate()).padStart(2, '0'),
-      ].join('');
-      const reminderAt = [
-        reminder.getFullYear(),
-        String(reminder.getMonth() + 1).padStart(2, '0'),
-        String(reminder.getDate()).padStart(2, '0'),
-      ].join('') + 'T203000';
-
-      const uid          = `${ymd}-${ev.title.replace(/\s+/g, '-').toLowerCase()}@skraldetomning`;
-      const { icon }     = wasteType(ev.title);
-      const summary      = `${icon} ${ev.title}`.replace(/[\\;,]/g, '\\$&'); // ICS escape + emoji
-
-      lines.push(
-        'BEGIN:VEVENT',
-        `DTSTART;VALUE=DATE:${ymd}`,
-        `DTEND;VALUE=DATE:${ymdt}`,
-        `SUMMARY:${summary}`,
-        `DESCRIPTION:Tømning\\: ${summary}`,
-        `UID:${uid}`,
-        'BEGIN:VALARM',
-        'ACTION:DISPLAY',
-        'DESCRIPTION:Påmindelse: Tømning i morgen',
-        `TRIGGER;VALUE=DATE-TIME:${reminderAt}`,
-        'END:VALARM',
-        'X-MICROSOFT-CDO-BUSYSTATUS:FREE',
-        'X-MICROSOFT-CDO-INTENDEDSTATUS:FREE',
-        'TRANSP:TRANSPARENT',
-        'END:VEVENT'
-      );
-    }
-
-    lines.push('END:VCALENDAR');
+    const ics = buildIcs(events);
 
     res.setHeader('Content-Type', 'text/calendar; charset=utf-8');
     res.setHeader('Content-Disposition', 'attachment; filename="skraldetomning.ics"');
-    res.send(lines.join('\r\n'));
+    res.send(ics);
   } catch (err) {
     res.status(500).send('Fejl: ' + err.message);
   }
