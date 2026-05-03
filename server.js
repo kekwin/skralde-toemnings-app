@@ -260,6 +260,8 @@ app.get('/api/calendar.ics', async (req, res) => {
         'DESCRIPTION:Påmindelse: Tømning i morgen',
         `TRIGGER;VALUE=DATE-TIME:${reminderAt}`,
         'END:VALARM',
+        'X-MICROSOFT-CDO-BUSYSTATUS:FREE',
+        'X-MICROSOFT-CDO-INTENDEDSTATUS:FREE',
         'TRANSP:TRANSPARENT',
         'END:VEVENT'
       );
