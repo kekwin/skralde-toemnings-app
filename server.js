@@ -5,29 +5,34 @@ const fetch   = require('node-fetch');
 const fs      = require('fs');
 const path    = require('path');
 
+const { wasteType } = require('./public/waste-types.js');
+
 const app  = express();
 const PORT = 3000;
 
 const DATA_DIR           = path.join(__dirname, 'data');
 const SAVED_ADDRESS_FILE = path.join(DATA_DIR, 'saved-address.json');
 const VESTFOR_BASE       = 'https://selvbetjening.vestfor.dk';
+const FETCH_TIMEOUT_MS   = 10000;
 
-// ── Waste type metadata ───────────────────────────────────────────────────────
-function wasteType(title) {
-  const t = title.toLowerCase();
-  if (t.includes('dagrenovation'))                 return { icon: '🗑️', color: '#94A3B8', bg: '#F1F5F9', fg: '#475569' };
-  if (t.includes('papir'))                         return { icon: '📄', color: '#3B82F6', bg: '#DBEAFE', fg: '#1D4ED8' };
-  if (t.includes('pap'))                           return { icon: '📦', color: '#A16207', bg: '#FEF9C3', fg: '#78350F' };
-  if (t.includes('glas'))                          return { icon: '🍾', color: '#14B8A6', bg: '#CCFBF1', fg: '#134E4A' };
-  if (t.includes('plast') && t.includes('metal'))  return { icon: '♻️', color: '#F59E0B', bg: '#FEF3C7', fg: '#78350F' };
-  if (t.includes('plast'))                         return { icon: '♻️', color: '#FBBF24', bg: '#FEF9C3', fg: '#713F12' };
-  if (t.includes('metal'))                         return { icon: '🔩', color: '#F97316', bg: '#FFEDD5', fg: '#7C2D12' };
-  if (t.includes('haveaffald') || t.includes('have')) return { icon: '🌿', color: '#22C55E', bg: '#DCFCE7', fg: '#14532D' };
-  if (t.includes('madaffald')  || t.includes('mad'))  return { icon: '🍕', color: '#84CC16', bg: '#ECFCCB', fg: '#365314' };
-  if (t.includes('restaffald'))                    return { icon: '⚫', color: '#6B7280', bg: '#F3F4F6', fg: '#374151' };
-  if (t.includes('storskrald'))                    return { icon: '🛋️', color: '#D97706', bg: '#FEF3C7', fg: '#78350F' };
-  if (t.includes('farlig'))                        return { icon: '⚠️', color: '#EF4444', bg: '#FEE2E2', fg: '#991B1B' };
-  return                                                  { icon: '🗓️', color: '#CBD5E0', bg: '#F1F5F9', fg: '#4A5568' };
+/**
+ * fetch() with a hard timeout, so a hung Vestfor request can't leave the
+ * app spinning forever. Throws a friendly error on timeout instead of the
+ * raw AbortError.
+ */
+async function fetchWithTimeout(url, options = {}, timeoutMs = FETCH_TIMEOUT_MS) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      throw new Error(`Vestfor svarede ikke inden for ${timeoutMs / 1000} sekunder`);
+    }
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 // Build a stable RFC-5545-safe UID token from event title.
@@ -160,7 +165,7 @@ async function fetchFollowingRedirects(startUrl) {
   let currentUrl = startUrl;
 
   for (let hop = 0; hop < 10; hop++) {
-    const resp = await fetch(currentUrl, {
+    const resp = await fetchWithTimeout(currentUrl, {
       redirect: 'manual',
       headers: {
         'User-Agent': 'Mozilla/5.0 (compatible; Skraldetomning/1.0)',
@@ -217,7 +222,7 @@ async function fetchTommeDates(retry = true) {
   const end   = future.toISOString().slice(0, 10);
   const url   = `${VESTFOR_BASE}/Adresse/ToemmeDates?start=${start}&end=${end}`;
 
-  const resp = await fetch(url, {
+  const resp = await fetchWithTimeout(url, {
     headers: {
       'Cookie':            cookieString(sessionCookies),
       'Referer':           `${VESTFOR_BASE}/Home/MinSide?address-selected-id=${currentAddressId}`,
@@ -273,7 +278,7 @@ app.get('/api/search', async (req, res) => {
   if (!term) return res.json([]);
 
   try {
-    const r = await fetch(
+    const r = await fetchWithTimeout(
       `${VESTFOR_BASE}/Adresse/AddressByName?term=${encodeURIComponent(term)}&numberOfResults=100`,
       { headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' } }
     );

@@ -7,23 +7,8 @@ const MONTHS_DA   = ['januar','februar','marts','april','maj','juni',
 const MONTHS_FULL = ['Januar','Februar','Marts','April','Maj','Juni',
                      'Juli','August','September','Oktober','November','December'];
 
-// ── Waste-type classifier ─────────────────────────────────────────────────────
-function classifyType(title) {
-  const t = title.toLowerCase();
-  if (t.includes('dagrenovation'))                 return { icon: '🗑️',  cls: 'type-dagrenov' };
-  if (t.includes('papir'))                         return { icon: '📄',  cls: 'type-papir'      };
-  if (t.includes('pap'))                           return { icon: '📦',  cls: 'type-pap'        };
-  if (t.includes('glas'))                          return { icon: '🍾',  cls: 'type-glas' };
-  if (t.includes('plast') && t.includes('metal'))  return { icon: '♻️',  cls: 'type-plast-metal' };
-  if (t.includes('plast'))                         return { icon: '♻️',  cls: 'type-plast' };
-  if (t.includes('metal'))                         return { icon: '🔩',  cls: 'type-metal' };
-  if (t.includes('haveaffald') || t.includes('have')) return { icon: '🌿',  cls: 'type-have' };
-  if (t.includes('madaffald')  || t.includes('mad'))  return { icon: '🍕', cls: 'type-mad'   };
-  if (t.includes('restaffald'))                    return { icon: '⚫',  cls: 'type-rest' };
-  if (t.includes('storskrald'))                    return { icon: '🛋️',  cls: 'type-stor' };
-  if (t.includes('farlig'))                        return { icon: '⚠️',  cls: 'type-farlig' };
-  return                                                  { icon: '🗓️',  cls: 'type-default' };
-}
+// Waste-type classifier (icon/cls/color) lives in waste-types.js, loaded
+// before this script — see index.html.
 
 // ── Date helpers ──────────────────────────────────────────────────────────────
 
@@ -65,7 +50,8 @@ function escapeHtml(str) {
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 // ── DOM refs ──────────────────────────────────────────────────────────────────
@@ -156,7 +142,7 @@ function renderDates(dates) {
       <div class="events-card">`;
 
     for (const ev of events) {
-      const { icon, cls } = classifyType(ev.title);
+      const { icon, cls } = wasteType(ev.title);
       const d        = parseLocalDate(ev.start);
       const dayShort = DAYS_SHORT[d.getDay()];
       const dayNum   = d.getDate();
