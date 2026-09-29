@@ -9,36 +9,39 @@
 // cls   – CSS class used by public/app.js + style.css (--row-color / --badge-*)
 // color – left-border colour, used directly by public/print.html
 // bg/fg – badge background/text colour, used directly by public/print.html
+//
+// Colours are the Sommer palette (familien-sommer-hub/docs/FARVER.md): colour = the palette hue,
+// bg = its tint on the light surface, fg = ink. style.css uses the same palette via CSS variables.
 
 const WASTE_TYPES = [
   { test: t => t.includes('dagrenovation'),
-    icon: '🗑️', cls: 'type-dagrenov',    color: '#94A3B8', bg: '#F1F5F9', fg: '#475569' },
+    icon: '🗑️', cls: 'type-dagrenov',    color: '#8A857A', bg: '#F1EEE7', fg: '#1C1A17' },
   { test: t => t.includes('papir'),
-    icon: '📄', cls: 'type-papir',       color: '#3B82F6', bg: '#DBEAFE', fg: '#1D4ED8' },
+    icon: '📄', cls: 'type-papir',       color: '#2F6FD0', bg: '#E4EBF4', fg: '#1C1A17' },
   { test: t => t.includes('pap'),
-    icon: '📦', cls: 'type-pap',         color: '#A16207', bg: '#FEF9C3', fg: '#78350F' },
+    icon: '📦', cls: 'type-pap',         color: '#E0A100', bg: '#FAEFD4', fg: '#1C1A17' },
   { test: t => t.includes('glas'),
-    icon: '🍾', cls: 'type-glas',        color: '#14B8A6', bg: '#CCFBF1', fg: '#134E4A' },
+    icon: '🍾', cls: 'type-glas',        color: '#14A38B', bg: '#E0F1EB', fg: '#1C1A17' },
   { test: t => t.includes('plast') && t.includes('metal'),
-    icon: '♻️', cls: 'type-plast-metal', color: '#F59E0B', bg: '#FEF3C7', fg: '#78350F' },
+    icon: '♻️', cls: 'type-plast-metal', color: '#C8579B', bg: '#F8E7ED', fg: '#1C1A17' },
   { test: t => t.includes('plast'),
-    icon: '♻️', cls: 'type-plast',       color: '#FBBF24', bg: '#FEF9C3', fg: '#713F12' },
+    icon: '♻️', cls: 'type-plast',       color: '#C8579B', bg: '#F8E7ED', fg: '#1C1A17' },
   { test: t => t.includes('metal'),
-    icon: '🔩', cls: 'type-metal',       color: '#F97316', bg: '#FFEDD5', fg: '#7C2D12' },
+    icon: '🔩', cls: 'type-metal',       color: '#E8603C', bg: '#FCE9E0', fg: '#1C1A17' },
   { test: t => t.includes('haveaffald') || t.includes('have'),
-    icon: '🌿', cls: 'type-have',        color: '#22C55E', bg: '#DCFCE7', fg: '#14532D' },
+    icon: '🌿', cls: 'type-have',        color: '#3F8F2A', bg: '#E6EFDE', fg: '#1C1A17' },
   { test: t => t.includes('madaffald') || t.includes('mad'),
-    icon: '🍕', cls: 'type-mad',         color: '#84CC16', bg: '#ECFCCB', fg: '#365314' },
+    icon: '🍕', cls: 'type-mad',         color: '#3F8F2A', bg: '#E6EFDE', fg: '#1C1A17' },
   { test: t => t.includes('restaffald'),
-    icon: '⚫', cls: 'type-rest',        color: '#6B7280', bg: '#F3F4F6', fg: '#374151' },
+    icon: '⚫', cls: 'type-rest',        color: '#57534B', bg: '#F1EEE7', fg: '#1C1A17' },
   { test: t => t.includes('storskrald'),
-    icon: '🛋️', cls: 'type-stor',        color: '#D97706', bg: '#FEF3C7', fg: '#78350F' },
+    icon: '🛋️', cls: 'type-stor',        color: '#6A4FC9', bg: '#ECE6F3', fg: '#1C1A17' },
   { test: t => t.includes('farlig'),
-    icon: '⚠️', cls: 'type-farlig',      color: '#EF4444', bg: '#FEE2E2', fg: '#991B1B' },
+    icon: '⚠️', cls: 'type-farlig',      color: '#D6404E', bg: '#FAE4E3', fg: '#1C1A17' },
 ];
 
 const DEFAULT_WASTE_TYPE = {
-  icon: '🗓️', cls: 'type-default', color: '#CBD5E0', bg: '#F1F5F9', fg: '#4A5568',
+  icon: '🗓️', cls: 'type-default', color: '#CFC8BA', bg: '#F1EEE7', fg: '#1C1A17',
 };
 
 /** Classify a Vestfor event title into { icon, cls, color, bg, fg }. */

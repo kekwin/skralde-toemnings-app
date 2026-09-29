@@ -1,15 +1,15 @@
 /* ── Reset & base ────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* Farverne kommer fra Sommer-paletten (sommer-palette.css, kopi fra familien-sommer-hub/design).
+   Her står kun appens egne navne for rollerne. Ingen hex-værdier i resten af filen. */
 :root {
   --font:       Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --bg:         #EEF2F7;
-  --surface:    #FFFFFF;
-  --border:     #E2E8F0;
-  --text:       #1A202C;
-  --text-muted: #718096;
-  --green:      #0D9488;
-  --green-dark: #0F766E;
+  --bg:         var(--page);
+  --text:       var(--ink);
+  --text-muted: var(--ink-2);
+  --green:      var(--accent);                                     /* accent (hed grøn før paletten) */
+  --green-dark: color-mix(in oklab, var(--accent) 82%, black);
   --radius-sm:  8px;
   --radius:     14px;
   --shadow-sm:  0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
@@ -73,7 +73,7 @@ h1 {
   border-radius: var(--radius);
   box-shadow:    var(--shadow-sm);
   padding:       20px;
-  border:        1px solid var(--border);
+  border:        1px solid var(--grid);
 }
 
 /* ── Search ──────────────────────────────────────────────────────────────── */
@@ -96,7 +96,7 @@ h1 {
   transform:      translateY(-50%);
   width:          18px;
   height:         18px;
-  color:          #94A3B8;
+  color:          var(--muted);
   pointer-events: none;
   z-index:        1;
 }
@@ -104,20 +104,20 @@ h1 {
 #search-input {
   width:         100%;
   padding:       13px 14px 13px 44px;
-  border:        1.5px solid var(--border);
+  border:        1.5px solid var(--grid);
   border-radius: var(--radius-sm);
   font-size:     1rem;
   font-family:   var(--font);
   color:         var(--text);
-  background:    #FAFBFC;
+  background:    var(--surface-2);
   outline:       none;
   transition:    border-color 0.15s, box-shadow 0.15s, background 0.15s;
 }
 
 #search-input:focus {
   border-color: var(--green);
-  box-shadow:   0 0 0 3px rgba(13,148,136,.13);
-  background:   #FFFFFF;
+  box-shadow:   0 0 0 3px color-mix(in oklab, var(--accent) 18%, transparent);
+  background:   var(--surface);
 }
 
 /* ── Autocomplete ────────────────────────────────────────────────────────── */
@@ -127,7 +127,7 @@ h1 {
   left:        0;
   right:       0;
   background:  var(--surface);
-  border:      1.5px solid var(--border);
+  border:      1.5px solid var(--grid);
   border-radius: var(--radius-sm);
   box-shadow:  var(--shadow);
   z-index:     200;
@@ -143,11 +143,11 @@ h1 {
   padding:       11px 14px;
   cursor:        pointer;
   transition:    background 0.1s;
-  border-bottom: 1px solid #F8FAFC;
+  border-bottom: 1px solid var(--grid);
 }
 .autocomplete-item:last-child  { border-bottom: none; }
 .autocomplete-item:hover,
-.autocomplete-item:focus       { background: #F0FDF4; outline: none; }
+.autocomplete-item:focus       { background: var(--tint-fjord); outline: none; }
 
 .ac-icon   { font-size: 1rem; flex-shrink: 0; }
 .ac-name   { flex: 1; font-size: 0.9375rem; color: var(--text); }
@@ -155,7 +155,7 @@ h1 {
   font-size:     0.8125rem;
   color:         var(--text-muted);
   flex-shrink:   0;
-  background:    #F1F5F9;
+  background:    var(--surface-2);
   padding:       2px 8px;
   border-radius: 20px;
 }
@@ -174,7 +174,7 @@ h1 {
 .spinner {
   width:        22px;
   height:       22px;
-  border:       2.5px solid #E2E8F0;
+  border:       2.5px solid var(--grid);
   border-top-color: var(--green);
   border-radius: 50%;
   animation:    spin 0.65s linear infinite;
@@ -185,15 +185,15 @@ h1 {
 
 /* ── Error ───────────────────────────────────────────────────────────────── */
 .error-card {
-  background:    #FFF5F5;
-  border:        1.5px solid #FED7D7;
+  background:    var(--tint-hyben);
+  border:        1.5px solid color-mix(in oklab, var(--c-hyben) 35%, var(--surface));
   border-radius: var(--radius-sm);
   padding:       14px 16px;
   display:       flex;
   align-items:   center;
   gap:           10px;
   font-size:     0.9375rem;
-  color:         #742A2A;
+  color:         var(--ink);
 }
 
 .error-icon { font-size: 1.1rem; flex-shrink: 0; }
@@ -222,7 +222,7 @@ h1 {
   letter-spacing: 0.07em;
   color:          var(--text-muted);
   padding-bottom: 8px;
-  border-bottom:  2px solid var(--border);
+  border-bottom:  2px solid var(--grid);
   margin-bottom:  10px;
 }
 
@@ -230,7 +230,7 @@ h1 {
   background:    var(--surface);
   border-radius: var(--radius);
   box-shadow:    var(--shadow-sm);
-  border:        1px solid var(--border);
+  border:        1px solid var(--grid);
   overflow:      hidden;
 }
 
@@ -240,12 +240,12 @@ h1 {
   align-items: center;
   padding:     13px 16px;
   gap:         14px;
-  border-left: 4px solid var(--row-color, #CBD5E0);
+  border-left: 4px solid var(--row-color, var(--axis));
   animation:   fadeInUp 0.35s ease both;
   transition:  background 0.12s;
 }
-.event-row:hover { background: #FAFAFA; }
-.events-card .event-row:not(:last-child) { border-bottom: 1px solid #F1F5F9; }
+.event-row:hover { background: var(--surface-2); }
+.events-card .event-row:not(:last-child) { border-bottom: 1px solid var(--grid); }
 
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(5px); }
@@ -283,8 +283,8 @@ h1 {
   border-radius: 999px;
   font-size:     0.875rem;
   font-weight:   600;
-  background:    var(--badge-bg, #F1F5F9);
-  color:         var(--badge-fg, #475569);
+  background:    var(--badge-bg, var(--surface-2));
+  color:         var(--ink);
   flex-shrink:   0;
 }
 .event-icon { font-size: 0.9375rem; }
@@ -299,9 +299,9 @@ h1 {
   flex-shrink:   0;
   letter-spacing: 0.01em;
 }
-.urgent.today    { background: #FEF08A; color: #713F12; }
-.urgent.tomorrow { background: #BBF7D0; color: #14532D; }
-.urgent.soon     { background: #DDD6FE; color: #4C1D95; }
+.urgent.today    { background: var(--tint-solsikke); color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--c-solsikke); }
+.urgent.tomorrow { background: var(--tint-havgraes); color: var(--ink); }
+.urgent.soon     { background: var(--tint-lavendel); color: var(--ink); }
 
 /* ── Empty state ─────────────────────────────────────────────────────────── */
 .empty-msg {
@@ -340,31 +340,31 @@ h1 {
 .btn-ghost {
   background: transparent;
   color:      var(--text-muted);
-  border:     1.5px solid var(--border);
+  border:     1.5px solid var(--grid);
 }
 .btn-ghost:hover {
   background:   var(--surface);
-  border-color: #94A3B8;
+  border-color: var(--muted);
   color:        var(--text);
 }
 
 .btn-primary {
   background:  var(--green);
-  color:       #FFFFFF;
-  box-shadow:  0 2px 4px rgba(13,148,136,.30);
+  color:       var(--on-accent);
+  box-shadow:  0 2px 4px color-mix(in oklab, var(--accent) 30%, transparent);
 }
 .btn-primary:hover {
   background:  var(--green-dark);
-  box-shadow:  0 4px 8px rgba(13,148,136,.35);
+  box-shadow:  0 4px 8px color-mix(in oklab, var(--accent) 35%, transparent);
 }
 
 .btn-secondary {
-  background:  #1E293B;
-  color:       #F8FAFC;
+  background:  var(--ink);
+  color:       var(--page);
   box-shadow:  0 2px 4px rgba(0,0,0,.18);
 }
 .btn-secondary:hover {
-  background:  #0F172A;
+  background:  color-mix(in oklab, var(--ink) 85%, var(--accent));
   box-shadow:  0 4px 8px rgba(0,0,0,.22);
 }
 
@@ -373,53 +373,53 @@ h1 {
 /* ══════════════════════════════════════════════════════════════════════════ */
 
 /* 🗑️  Dagrenovation */
-.type-dagrenov                      { --row-color: #94A3B8; }
-.type-dagrenov .event-badge         { --badge-bg: #F1F5F9; --badge-fg: #475569; }
+.type-dagrenov                      { --row-color: var(--muted); }
+.type-dagrenov .event-badge         { --badge-bg: var(--surface-2); }
 
-/* �  Papir/Plast */
-.type-papir                         { --row-color: #3B82F6; }
-.type-papir .event-badge            { --badge-bg: #DBEAFE; --badge-fg: #1D4ED8; }
+/* 📄  Papir */
+.type-papir                         { --row-color: var(--c-fjord); }
+.type-papir .event-badge            { --badge-bg: var(--tint-fjord); }
 
 /* 📦  Pap (karton) */
-.type-pap                           { --row-color: #A16207; }
-.type-pap .event-badge              { --badge-bg: #FEF9C3; --badge-fg: #78350F; }
+.type-pap                           { --row-color: var(--c-solsikke); }
+.type-pap .event-badge              { --badge-bg: var(--tint-solsikke); }
 
 /* 🍾  Glas */
-.type-glas                          { --row-color: #14B8A6; }
-.type-glas .event-badge             { --badge-bg: #CCFBF1; --badge-fg: #134E4A; }
+.type-glas                          { --row-color: var(--c-havgraes); }
+.type-glas .event-badge             { --badge-bg: var(--tint-havgraes); }
 
 /* ♻️  Plast + Metal (combined) */
-.type-plast-metal                   { --row-color: #F59E0B; }
-.type-plast-metal .event-badge      { --badge-bg: #FEF3C7; --badge-fg: #78350F; }
+.type-plast-metal                   { --row-color: var(--c-lyng); }
+.type-plast-metal .event-badge      { --badge-bg: var(--tint-lyng); }
 
 /* ♻️  Plast */
-.type-plast                         { --row-color: #FBBF24; }
-.type-plast .event-badge            { --badge-bg: #FEF9C3; --badge-fg: #713F12; }
+.type-plast                         { --row-color: var(--c-lyng); }
+.type-plast .event-badge            { --badge-bg: var(--tint-lyng); }
 
 /* 🔩  Metal */
-.type-metal                         { --row-color: #F97316; }
-.type-metal .event-badge            { --badge-bg: #FFEDD5; --badge-fg: #7C2D12; }
+.type-metal                         { --row-color: var(--c-koral); }
+.type-metal .event-badge            { --badge-bg: var(--tint-koral); }
 
 /* 🌿  Haveaffald */
-.type-have                          { --row-color: #22C55E; }
-.type-have .event-badge             { --badge-bg: #DCFCE7; --badge-fg: #14532D; }
+.type-have                          { --row-color: var(--c-eng); }
+.type-have .event-badge             { --badge-bg: var(--tint-eng); }
 
 /* 🍃  Madaffald */
-.type-mad                           { --row-color: #84CC16; }
-.type-mad .event-badge              { --badge-bg: #ECFCCB; --badge-fg: #365314; }
+.type-mad                           { --row-color: var(--c-eng); }
+.type-mad .event-badge              { --badge-bg: var(--tint-eng); }
 
 /* ⚫  Restaffald */
-.type-rest                          { --row-color: #6B7280; }
-.type-rest .event-badge             { --badge-bg: #F3F4F6; --badge-fg: #374151; }
+.type-rest                          { --row-color: var(--ink-2); }
+.type-rest .event-badge             { --badge-bg: var(--surface-2); }
 
 /* 📦  Storskrald */
-.type-stor                          { --row-color: #D97706; }
-.type-stor .event-badge             { --badge-bg: #FEF3C7; --badge-fg: #78350F; }
+.type-stor                          { --row-color: var(--c-lavendel); }
+.type-stor .event-badge             { --badge-bg: var(--tint-lavendel); }
 
 /* ⚠️  Farligt affald */
-.type-farlig                        { --row-color: #EF4444; }
-.type-farlig .event-badge           { --badge-bg: #FEE2E2; --badge-fg: #991B1B; }
+.type-farlig                        { --row-color: var(--c-hyben); }
+.type-farlig .event-badge           { --badge-bg: var(--tint-hyben); }
 
 /* 🗓️  Ukendt type */
-.type-default                       { --row-color: #CBD5E0; }
-.type-default .event-badge          { --badge-bg: #F1F5F9; --badge-fg: #4A5568; }
+.type-default                       { --row-color: var(--axis); }
+.type-default .event-badge          { --badge-bg: var(--surface-2); }

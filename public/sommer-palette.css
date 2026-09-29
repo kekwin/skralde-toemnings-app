@@ -1,0 +1,111 @@
+/*
+ * Sommer-paletten: fælles farver for alle apps i Familien Sommer hub.
+ * Kopiér filen ind i appen (fx src/sommer-palette.css) og importér den før appens egen CSS.
+ * Skriv altid mod rollerne (--surface, --ink, --c-fjord …), aldrig mod hex-værdierne.
+ * Regler og baggrund: docs/FARVER.md. Version 1, 29. september 2026.
+ */
+
+:root {
+  color-scheme: light;
+
+  /* Flader og tekst: varme, sandfarvede neutraler */
+  --page: #f7f5f0;
+  --surface: #fffdf9;
+  --surface-2: #f1eee7;
+  --ink: #1c1a17;
+  --ink-2: #57534b;
+  --muted: #8a857a;
+  --grid: #e7e2d8;
+  --axis: #cfc8ba;
+  --border: rgba(28, 26, 23, 0.1);
+
+  /* Accent: knapper, links, valgt fane */
+  --accent: #2f6fd0;
+  --on-accent: #ffffff;
+
+  /*
+   * Otte kategorifarver i fast rækkefølge. Serie 1 får fjord, serie 2 koral osv.; spring aldrig over.
+   * Rækkefølgen er valideret for farveblindhed (værste nabopar ΔE 12,2 lys / 10,9 mørk, mål ≥ 8)
+   * og almindeligt syn (≥ 18,8, krav ≥ 15). Solsikke har under 3:1 kontrast på lys flade:
+   * brug den med synlige tal eller en tabel ved siden af.
+   */
+  --c-fjord: #2f6fd0;
+  --c-koral: #e8603c;
+  --c-havgraes: #14a38b;
+  --c-solsikke: #e0a100;
+  --c-lyng: #c8579b;
+  --c-eng: #3f8f2a;
+  --c-lavendel: #6a4fc9;
+  --c-hyben: #d6404e;
+
+  /* Status: kun til tilstand (ok, advarsel, fejl), altid med ikon eller tekst ved siden af */
+  --good: #1a7f2e;
+  --warning: #b86e00;
+  --critical: #c42b2b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #121110;
+    --surface: #1f1d1a;
+    --surface-2: #2a2723;
+    --ink: #fbf8f2;
+    --ink-2: #cdc6b8;
+    --muted: #8f897d;
+    --grid: #2f2c28;
+    --axis: #45413a;
+    --border: rgba(255, 250, 240, 0.1);
+    --accent: #4a86e8;
+    --on-accent: #ffffff;
+    --c-fjord: #4a86e8;
+    --c-koral: #d9603c;
+    --c-havgraes: #17a58c;
+    --c-solsikke: #bd8800;
+    --c-lyng: #d468a8;
+    --c-eng: #4e9c34;
+    --c-lavendel: #8f7cec;
+    --c-hyben: #e25a66;
+    --good: #3fb950;
+    --warning: #e3a33b;
+    --critical: #f06a6a;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #121110;
+  --surface: #1f1d1a;
+  --surface-2: #2a2723;
+  --ink: #fbf8f2;
+  --ink-2: #cdc6b8;
+  --muted: #8f897d;
+  --grid: #2f2c28;
+  --axis: #45413a;
+  --border: rgba(255, 250, 240, 0.1);
+  --accent: #4a86e8;
+  --on-accent: #ffffff;
+  --c-fjord: #4a86e8;
+  --c-koral: #d9603c;
+  --c-havgraes: #17a58c;
+  --c-solsikke: #bd8800;
+  --c-lyng: #d468a8;
+  --c-eng: #4e9c34;
+  --c-lavendel: #8f7cec;
+  --c-hyben: #e25a66;
+  --good: #3fb950;
+  --warning: #e3a33b;
+  --critical: #f06a6a;
+}
+
+/* Lyse tonede flader til kort og mærkater: farven blandet ind i fladen. Tekst ovenpå bruger --ink. */
+:root {
+  --tint-fjord: color-mix(in oklab, var(--c-fjord) 13%, var(--surface));
+  --tint-koral: color-mix(in oklab, var(--c-koral) 13%, var(--surface));
+  --tint-havgraes: color-mix(in oklab, var(--c-havgraes) 13%, var(--surface));
+  --tint-solsikke: color-mix(in oklab, var(--c-solsikke) 15%, var(--surface));
+  --tint-lyng: color-mix(in oklab, var(--c-lyng) 13%, var(--surface));
+  --tint-eng: color-mix(in oklab, var(--c-eng) 13%, var(--surface));
+  --tint-lavendel: color-mix(in oklab, var(--c-lavendel) 13%, var(--surface));
+  --tint-hyben: color-mix(in oklab, var(--c-hyben) 13%, var(--surface));
+}
