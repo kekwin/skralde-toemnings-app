@@ -8,7 +8,7 @@ const path    = require('path');
 const { wasteType } = require('./public/waste-types.js');
 
 const app  = express();
-const PORT = 3000;
+const PORT = Number(process.env.PORT) || 3000;
 
 const DATA_DIR           = path.join(__dirname, 'data');
 const SAVED_ADDRESS_FILE = path.join(DATA_DIR, 'saved-address.json');
