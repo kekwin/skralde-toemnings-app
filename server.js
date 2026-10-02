@@ -309,7 +309,8 @@ app.get('/api/dates', async (req, res) => {
 
   try {
     const dates = await fetchTommeDates();
-    res.json(dates);
+    // Ikonet pr. affaldstype sendes med, så hub'ens forside viser de samme ikoner som appen.
+    res.json(dates.map(ev => ({ ...ev, icon: wasteType(ev.title).icon })));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
