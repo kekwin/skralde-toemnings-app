@@ -10,6 +10,19 @@ Lokal app der henter tømmedatoer fra Vestfor og viser dem i et overskueligt int
 - Kalenderfilen markerer events som ledig tid (free), inkl. Outlook/Microsoft-specifikke felter for bedre import-kompatibilitet.
 - UID i kalenderfilen genereres nu RFC-5545-kompatibelt (uden ugyldige tegn som `/`) for bedre Outlook-import.
 
+## Hjemmeadresse
+
+Sæt `HOME_ADDRESS` til husets adresse, præcis som Vestfor skriver den, fx
+`HOME_ADDRESS="Rendsagervej 130, 2625 Vallensbæk"`. I Familien Sommer hub står den som
+`SKRALDE_HOME_ADDRESS` i hub'ens `.env`.
+
+- Hjemmet ændres ikke, når man slår andre adresser op med "Skift adresse". Appen viser en knap
+  tilbage til hjemmet, når den står på en anden adresse.
+- `GET /api/home` giver hjemmeadressen, og `GET /api/home/dates` giver tømmedatoerne for hjemmet.
+  Hub'ens forside bruger dem.
+- Hver adresse får sin egen session hos Vestfor, så hjemmet og den viste adresse ikke blander sig.
+- Uden `HOME_ADDRESS` virker appen som før.
+
 ## Første gang
 
 Åbn en terminal (PowerShell eller CMD) i mappen og kør:

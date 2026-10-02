@@ -432,3 +432,18 @@ h1 {
 /* 🗓️  Ukendt type */
 .type-default                       { --row-color: var(--axis); }
 .type-default .event-badge          { --badge-bg: var(--surface-2); }
+
+/* ── Anden adresse end hjemmet ─────────────────────────────────────────────── */
+.home-banner {
+  display:       flex;
+  flex-wrap:     wrap;
+  align-items:   center;
+  justify-content: space-between;
+  gap:           8px 16px;
+  margin-top:    16px;
+  padding:       10px 14px;
+  border-radius: 10px;
+  border:        1px solid var(--warning);
+  background:    color-mix(in oklab, var(--warning) 12%, var(--surface));
+  font-size:     0.9rem;
+}

@@ -68,15 +68,20 @@ const datesList        = document.getElementById('dates-list');
 const actionBar        = document.getElementById('action-bar');
 const refreshBtn       = document.getElementById('refresh-btn');
 const changeAddressBtn = document.getElementById('change-address-btn');
+const homeBanner       = document.getElementById('home-banner');
+const homeBtn          = document.getElementById('home-btn');
+const homeName         = document.getElementById('home-name');
 
 // ── App state ─────────────────────────────────────────────────────────────────
 let currentAddress = null;
+let homeAddress    = null;   // HOME_ADDRESS fra hub'ens .env (null, hvis den ikke er sat)
 let searchTimer    = null;
 
 // ── View helpers ──────────────────────────────────────────────────────────────
 function showSearchView() {
   searchSection.classList.remove('hidden');
   datesSection.classList.add('hidden');
+  homeBanner.classList.add('hidden');
   actionBar.classList.add('hidden');
   errorCard.classList.add('hidden');
   headerSubtitle.textContent = 'Søg din adresse for at se tømmedatoer';
@@ -86,7 +91,10 @@ function showSearchView() {
 function showDatesView() {
   if (currentAddress) {
     const postnr = currentAddress.postnr ? `, ${currentAddress.postnr}` : '';
-    headerSubtitle.textContent = `📍 ${currentAddress.navn || ''}${postnr}`;
+    const atHome = homeAddress && currentAddress.id === homeAddress.id;
+    headerSubtitle.textContent = `${atHome ? '🏠' : '📍'} ${currentAddress.navn || ''}${postnr}${atHome ? ' (hjemme)' : ''}`;
+    homeBanner.classList.toggle('hidden', !homeAddress || atHome);
+    if (homeAddress) homeName.textContent = homeAddress.navn.replace(/, \d{4} .*$/, '');
   }
   searchSection.classList.add('hidden');
   datesSection.classList.remove('hidden');
@@ -262,6 +270,7 @@ async function selectAddress({ id, navn, postnr }) {
 // ── Button handlers ───────────────────────────────────────────────────────────
 refreshBtn.addEventListener('click', loadDates);
 changeAddressBtn.addEventListener('click', showSearchView);
+homeBtn.addEventListener('click', () => homeAddress && selectAddress(homeAddress));
 
 retryBtn.addEventListener('click', () => {
   errorCard.classList.add('hidden');
@@ -275,6 +284,7 @@ retryBtn.addEventListener('click', () => {
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 async function init() {
+  homeAddress = await fetch('/api/home').then(r => (r.ok ? r.json() : null)).catch(() => null);
   try {
     const r     = await fetch('/api/saved-address');
     const saved = await r.json();

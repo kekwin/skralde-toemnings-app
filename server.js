@@ -138,8 +138,15 @@ function buildIcs(events) {
 }
 
 // ── In-memory session state ──────────────────────────────────────────────────
-let sessionCookies  = {};   // { name: value, ... }
-let currentAddressId = null;
+// Én Vestfor-session pr. adresse: Vestfor husker den valgte adresse i sessionen, så hjemmet og den
+// adresse, man kigger på, må ikke dele cookies.
+const sessions       = new Map();   // addressId → { name: value, ... }
+let currentAddressId = null;        // den adresse, appen viser (saved-address.json)
+
+// Hjemmeadressen (HOME_ADDRESS, fx "Rendsagervej 130, 2625 Vallensbæk") står i hub'ens .env. Den
+// ændres ikke, når man slår andre adresser op, og det er den, hub'ens forside viser.
+const HOME_ADDRESS = (process.env.HOME_ADDRESS || '').trim();
+let home = null;                    // { id, navn, postnr }, når adressen er fundet hos Vestfor
 
 // ── Startup ──────────────────────────────────────────────────────────────────
 app.use(express.json());
@@ -161,7 +168,7 @@ function cookieString(cookies) {
  * hop (node-fetch v2 discards them when auto-following).
  */
 async function fetchFollowingRedirects(startUrl) {
-  let cookies    = { ...sessionCookies };
+  let cookies    = {};
   let currentUrl = startUrl;
 
   for (let hop = 0; hop < 10; hop++) {
@@ -199,13 +206,13 @@ async function fetchFollowingRedirects(startUrl) {
 }
 
 /**
- * Visit MinSide for the given address, collect all cookies, store globally.
+ * Visit MinSide for the given address in a fresh session and remember its cookies.
  */
 async function establishSession(addressId) {
   const url = `${VESTFOR_BASE}/Home/MinSide?address-selected-id=${encodeURIComponent(addressId)}`;
   const { cookies } = await fetchFollowingRedirects(url);
-  sessionCookies   = cookies;
-  currentAddressId = addressId;
+  sessions.set(addressId, cookies);
+  return cookies;
 }
 
 /**
@@ -213,7 +220,8 @@ async function establishSession(addressId) {
  * Automatically retries once by re-establishing the session if the response
  * is not a valid JSON array (session expired / never set).
  */
-async function fetchTommeDates(retry = true) {
+async function fetchTommeDates(addressId, retry = true) {
+  const cookies = sessions.get(addressId) || await establishSession(addressId);
   const now    = new Date();
   const future = new Date(now);
   future.setFullYear(future.getFullYear() + 1);
@@ -224,8 +232,8 @@ async function fetchTommeDates(retry = true) {
 
   const resp = await fetchWithTimeout(url, {
     headers: {
-      'Cookie':            cookieString(sessionCookies),
-      'Referer':           `${VESTFOR_BASE}/Home/MinSide?address-selected-id=${currentAddressId}`,
+      'Cookie':            cookieString(cookies),
+      'Referer':           `${VESTFOR_BASE}/Home/MinSide?address-selected-id=${addressId}`,
       'Accept':            'application/json',
       'X-Requested-With':  'XMLHttpRequest',
       'User-Agent':        'Mozilla/5.0 (compatible; Skraldetomning/1.0)',
@@ -242,33 +250,71 @@ async function fetchTommeDates(retry = true) {
     // Non-JSON response (usually HTML redirect to login) – retry
   }
 
-  if (retry && currentAddressId) {
-    await establishSession(currentAddressId);
-    return fetchTommeDates(false);
+  if (retry) {
+    await establishSession(addressId);
+    return fetchTommeDates(addressId, false);
   }
 
   throw new Error('Kunne ikke hente data fra Vestfor (ugyldigt svar)');
 }
 
-/** Restore currentAddressId from disk and establish a fresh session if needed. */
+/** Slår HOME_ADDRESS op hos Vestfor én gang. null, hvis den ikke er sat. */
+async function resolveHome() {
+  if (!HOME_ADDRESS) return null;
+  if (home) return home;
+  const r = await fetchWithTimeout(
+    `${VESTFOR_BASE}/Adresse/AddressByName?term=${encodeURIComponent(HOME_ADDRESS)}&numberOfResults=10`,
+    { headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' } }
+  );
+  const list = await r.json();
+  const norm = s => String(s || '').toLowerCase().replace(/s+/g, ' ').trim();
+  const hit  = list.find(a => norm(a.FuldtVejnavn) === norm(HOME_ADDRESS)) || (list.length === 1 ? list[0] : null);
+  if (!hit) throw new Error(`Hjemmeadressen "${HOME_ADDRESS}" blev ikke fundet hos Vestfor`);
+  home = { id: hit.Id, navn: hit.FuldtVejnavn, postnr: hit.Postnr };
+  return home;
+}
+
+/** Den viste adresse: den gemte, ellers hjemmet. */
 async function ensureAddressLoaded() {
-  if (!currentAddressId && fs.existsSync(SAVED_ADDRESS_FILE)) {
-    const saved      = JSON.parse(fs.readFileSync(SAVED_ADDRESS_FILE, 'utf8'));
-    currentAddressId = saved.id;
-    // No session exists yet (e.g. server just started) – establish one now
-    // so ToemmeDates gets a valid cookie on the very first call.
-    await establishSession(currentAddressId);
+  if (currentAddressId) return;
+  if (fs.existsSync(SAVED_ADDRESS_FILE)) {
+    currentAddressId = JSON.parse(fs.readFileSync(SAVED_ADDRESS_FILE, 'utf8')).id;
+  } else {
+    currentAddressId = (await resolveHome().catch(() => null))?.id ?? null;
   }
 }
+
+/** Tømmedatoer med ikonet pr. affaldstype, så hub'ens forside viser de samme ikoner som appen. */
+const withIcons = dates => dates.map(ev => ({ ...ev, icon: wasteType(ev.title).icon }));
 
 // ── Routes ────────────────────────────────────────────────────────────────────
 
 // GET /api/saved-address
-app.get('/api/saved-address', (req, res) => {
+app.get('/api/saved-address', async (req, res) => {
   if (fs.existsSync(SAVED_ADDRESS_FILE)) {
     res.json(JSON.parse(fs.readFileSync(SAVED_ADDRESS_FILE, 'utf8')));
   } else {
-    res.json(null);
+    res.json(await resolveHome().catch(() => null));
+  }
+});
+
+// GET /api/home – hjemmeadressen fra HOME_ADDRESS (null, hvis den ikke er sat)
+app.get('/api/home', async (req, res) => {
+  try {
+    res.json(await resolveHome());
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/home/dates – tømmedatoer for hjemmet, uanset hvilken adresse appen viser
+app.get('/api/home/dates', async (req, res) => {
+  try {
+    const h = await resolveHome();
+    if (!h) return res.status(404).json({ error: 'HOME_ADDRESS er ikke sat' });
+    res.json(withIcons(await fetchTommeDates(h.id)));
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -295,6 +341,7 @@ app.post('/api/set-address', async (req, res) => {
 
   try {
     await establishSession(id);
+    currentAddressId = id;
     fs.writeFileSync(SAVED_ADDRESS_FILE, JSON.stringify({ id, navn, postnr }, null, 2));
     res.json({ ok: true });
   } catch (err) {
@@ -308,9 +355,7 @@ app.get('/api/dates', async (req, res) => {
   if (!currentAddressId) return res.status(400).json({ error: 'Ingen adresse valgt' });
 
   try {
-    const dates = await fetchTommeDates();
-    // Ikonet pr. affaldstype sendes med, så hub'ens forside viser de samme ikoner som appen.
-    res.json(dates.map(ev => ({ ...ev, icon: wasteType(ev.title).icon })));
+    res.json(withIcons(await fetchTommeDates(currentAddressId)));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -322,7 +367,7 @@ app.get('/api/calendar.ics', async (req, res) => {
   if (!currentAddressId) return res.status(400).send('Ingen adresse valgt');
 
   try {
-    const dates  = await fetchTommeDates();
+    const dates  = await fetchTommeDates(currentAddressId);
     const events = dates.map(ev => {
       const ymd        = ev.start.slice(0, 10).replace(/-/g, '');  // "20250422"
       const { icon }   = wasteType(ev.title);
