@@ -1,4 +1,4 @@
-# Skraldetømningsapp som container til Familien Sommer hub.
+# Waste collection dates som container til Familien Sommer hub.
 # Data (den gemte adresse) ligger i /app/data, som monteres som volume.
 FROM node:24-alpine
 

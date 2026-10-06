@@ -1,5 +1,5 @@
 {
-  "name": "skraldetomningsapp",
+  "name": "waste-collection-dates",
   "version": "1.0.0",
   "description": "Vestfor tømmedatoer – lokal app",
   "main": "server.js",
