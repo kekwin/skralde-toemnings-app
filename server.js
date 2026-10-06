@@ -217,10 +217,11 @@ async function establishSession(addressId) {
 
 /**
  * Fetch tømmedatoer for the next 12 months.
- * Automatically retries once by re-establishing the session if the response
- * is not a valid JSON array (session expired / never set).
+ * Vestfor svarer med en tom liste ([]), ikke en fejl, når sessionen er udløbet. Derfor prøver vi
+ * igen med en ny session, både ved ugyldigt svar og ved en tom liste fra en genbrugt session.
  */
 async function fetchTommeDates(addressId, retry = true) {
+  const reused  = sessions.has(addressId);
   const cookies = sessions.get(addressId) || await establishSession(addressId);
   const now    = new Date();
   const future = new Date(now);
@@ -244,8 +245,8 @@ async function fetchTommeDates(addressId, retry = true) {
 
   try {
     const data = JSON.parse(text);
-    if (Array.isArray(data)) return data;
-    // Got an object/error – fall through to retry
+    if (Array.isArray(data) && (data.length > 0 || !reused)) return data;
+    // Fejl eller tom liste fra en gammel session – fald igennem til nyt forsøg
   } catch {
     // Non-JSON response (usually HTML redirect to login) – retry
   }
@@ -267,7 +268,7 @@ async function resolveHome() {
     { headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' } }
   );
   const list = await r.json();
-  const norm = s => String(s || '').toLowerCase().replace(/s+/g, ' ').trim();
+  const norm = s => String(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
   const hit  = list.find(a => norm(a.FuldtVejnavn) === norm(HOME_ADDRESS)) || (list.length === 1 ? list[0] : null);
   if (!hit) throw new Error(`Hjemmeadressen "${HOME_ADDRESS}" blev ikke fundet hos Vestfor`);
   home = { id: hit.Id, navn: hit.FuldtVejnavn, postnr: hit.Postnr };

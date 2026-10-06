@@ -1,6 +1,6 @@
 {
   "name": "waste-collection-dates",
-  "version": "1.0.0",
+  "version": "1.4.2",
   "description": "Vestfor tømmedatoer – lokal app",
   "main": "server.js",
   "scripts": {
