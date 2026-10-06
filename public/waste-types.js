@@ -10,7 +10,7 @@
 // color – left-border colour, used directly by public/print.html
 // bg/fg – badge background/text colour, used directly by public/print.html
 //
-// Colours are the Sommer palette (familien-sommer-hub/docs/FARVER.md): colour = the palette hue,
+// Colours are the Sommer palette (summer-hub/docs/FARVER.md): colour = the palette hue,
 // bg = its tint on the light surface, fg = ink. style.css uses the same palette via CSS variables.
 
 const WASTE_TYPES = [
