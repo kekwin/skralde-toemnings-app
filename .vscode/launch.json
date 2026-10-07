@@ -5,7 +5,8 @@
       "name": "Run Waste collection dates",
       "type": "node",
       "request": "launch",
-      "program": "${workspaceFolder}/server.js",
+      "program": "${workspaceFolder}/backend/server.ts",
+      "runtimeArgs": ["--import", "tsx"],
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "skipFiles": [

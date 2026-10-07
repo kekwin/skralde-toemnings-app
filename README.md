@@ -29,12 +29,13 @@ Sæt `HOME_ADDRESS` til husets adresse, præcis som Vestfor skriver den, fx
 
 ```
 npm install
+npm run build
 ```
 
 ## Start appen
 
 ```
-node server.js
+npm start
 ```
 
 Åbn derefter **http://localhost:3000** i din browser.

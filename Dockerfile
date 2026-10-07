@@ -1,19 +1,28 @@
 # Waste collection dates som container til Familien Sommer hub.
-# Data (den gemte adresse) ligger i /app/data, som monteres som volume.
-FROM node:24-alpine
+# Én proces: serveren leverer også siderne på samme port. Alt bundles med esbuild, så det færdige image
+# ikke har node_modules. Data (den gemte adresse) ligger i /app/data, som monteres som volume.
 
+FROM node:24-bookworm-slim AS build
 WORKDIR /app
-ENV NODE_ENV=production
-
 COPY package.json package-lock.json ./
-RUN npm ci --omit=dev && npm cache clean --force
+RUN npm ci
+COPY . .
+RUN npm run build
 
-COPY server.js ./
-COPY public ./public
+FROM node:24-bookworm-slim
+WORKDIR /app
+ENV NODE_ENV=production \
+    PORT=3000 \
+    DATA_DIR=/app/data \
+    STATIC_DIR=/app/dist \
+    TZ=Europe/Copenhagen
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/dist-server ./dist-server
+COPY package.json ./
 
 RUN mkdir -p /app/data && chown node:node /app/data
 USER node
 
 EXPOSE 3000
 VOLUME ["/app/data"]
-CMD ["node", "server.js"]
+CMD ["node", "dist-server/server.mjs"]
