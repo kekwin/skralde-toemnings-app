@@ -45,7 +45,7 @@ npm run dev            # genbygger siderne ved ændringer
 
 ## Status
 
-v2.0.0 kører i hub'en (7. oktober 2026; omskrevet til TypeScript `strict` med Express 5 og indbygget `fetch`, uændret funktion og uændret API) på http://127.0.0.1:3000 og https://waste-collection-dates.tailcc94cc.ts.net.
+v2.0.1 kører i hub'en (7. oktober 2026; omskrevet til TypeScript `strict` med Express 5 og indbygget `fetch`, uændret funktion og uændret API) på http://127.0.0.1:3000 og https://waste-collection-dates.tailcc94cc.ts.net.
 Henter datoer igen med ny session, når Vestfor svarer med en tom liste (v1.4.2).
 
 ## Næste skridt
