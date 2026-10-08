@@ -34,6 +34,10 @@ afterEach(() => {
 });
 
 describe("API", () => {
+  it("svarer på /health", async () => {
+    expect(await (await fetch(`${start()}/health`)).json()).toEqual({ ok: true });
+  });
+
   it("uden adresse er der intet at vise", async () => {
     const base = start();
     expect((await fetch(`${base}/api/dates`)).status).toBe(400);

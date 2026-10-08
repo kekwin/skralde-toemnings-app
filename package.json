@@ -1,7 +1,7 @@
 {
   "name": "waste-collection-dates",
   "private": true,
-  "version": "2.0.1",
+  "version": "2.0.2",
   "type": "module",
   "description": "Vestfor tømmedatoer – lokal app",
   "scripts": {

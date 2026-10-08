@@ -39,6 +39,7 @@ export const createApp = ({ vestfor, dataDir, staticDir, homeAddress = "" }: App
     currentAddressId = saved ? saved.id : ((await resolveHome().catch(() => null))?.id ?? null);
   };
 
+  app.get("/health", (_req, res) => void res.json({ ok: true }));
   app.use(express.json());
   if (staticDir) app.use(express.static(staticDir));
   fs.mkdirSync(dataDir, { recursive: true });
