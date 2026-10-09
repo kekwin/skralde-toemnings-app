@@ -1,0 +1,30 @@
+# KOPI af summer-hub/workflows/tag-version.yml – ret den i hub'en og kør `node scripts/sync-shared.mjs` dér.
+# Opretter versionstagget (v<version> fra package.json), når en ny version pushes til main.
+# Hvorfor: Claude-sessioner i skyen kan pushe til main, men proxyen afviser tag-push (HTTP 403).
+# Hub'en bygger fra tags, så GitHub opretter dem selv. Regler: summer-hub/docs/ARKITEKTUR.md, "Versionstags".
+name: Tag version
+
+on:
+  push:
+    branches: [main]
+    paths: [package.json]
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Opret versionstag, hvis det ikke findes
+        run: |
+          version=$(node -p "require('./package.json').version")
+          tag="v${version}"
+          if git ls-remote --exit-code --tags origin "refs/tags/${tag}" > /dev/null; then
+            echo "${tag} findes allerede, intet at gøre."
+            exit 0
+          fi
+          git tag "${tag}" "${GITHUB_SHA}"
+          git push origin "${tag}"
+          echo "Oprettede ${tag} på ${GITHUB_SHA}."
