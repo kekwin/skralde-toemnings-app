@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import { createApp } from "./app.ts";
 import { createVestfor } from "./vestfor.ts";
 
-const port = Number(process.env.PORT) || 3000;
+const port = Number(process.env.PORT) || 3100;
 const dataDir = process.env.DATA_DIR || path.join(process.cwd(), "data");
 const staticDir = process.env.STATIC_DIR || fileURLToPath(new URL("../dist/", import.meta.url));
 

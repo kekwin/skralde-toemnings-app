@@ -20,17 +20,17 @@ Fælles regler for alle apps (principper, skabelon til denne fil, git): [summer-
 
 ## Kør og test
 
-**Test og prod adskilles** ([summer-hub/docs/TEST-OG-PROD.md](https://github.com/kekwin/summer-hub/blob/main/docs/TEST-OG-PROD.md)): dev-port = prod + 100 (3100; prod-porten 3000 er containerens og bruges kun til `GET`), egen database i `data/`, og tjek hvem der svarer, før du skriver. Afviger i dag: lokal udvikling kører på 3000 og kræver, at containeren stoppes (rettes til 3100 ved lejlighed).
+**Test og prod adskilles** ([summer-hub/docs/TEST-OG-PROD.md](https://github.com/kekwin/summer-hub/blob/main/docs/TEST-OG-PROD.md)): dev-port = prod + 100 (3100; prod-porten 3000 er containerens og bruges kun til `GET`), egen database i `data/`, og tjek hvem der svarer, før du skriver. Følger reglen.
 
 ```sh
 npm install
 npm run check          # typecheck + lint + tests, skal være grøn før push
 npm run build          # dist/ (siderne) og dist-server/server.mjs
-npm run backend:watch  # serveren på http://localhost:3000 (læser .env)
+npm run backend:watch  # serveren på http://localhost:3100 (læser .env)
 npm run dev            # genbygger siderne ved ændringer
 ```
 
-`data/` er gitignored. Stop hub'ens container, før du kører lokalt på port 3000.
+`data/` er gitignored. Lokal kørsel bruger 3100 og stopper aldrig hub'ens container.
 
 ## Struktur
 
