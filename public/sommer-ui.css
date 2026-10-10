@@ -1,0 +1,107 @@
+/*
+ * Sommerhimmel: det fælles udseende for alle apps i Familien Sommer hub (Kewins valg, 10. oktober 2026, i lys version).
+ * Glas og farveforløb: en himmel af bløde farver bag frostede glaskort, app-mærker som farvede "squircles" med hvidt
+ * ikon, Plus Jakarta Sans og Font Awesome Solid. Baggrund: docs/DESIGN-FORSLAG.md.
+ *
+ * Indlæses efter sommer-palette.css (og fonts/fonts.css). Gælder, når <html> har data-design="sommerhimmel"; sæt også
+ * data-theme="light", så paletten og light-dark() altid giver den lyse version. De mørke værdier står klar til senere.
+ * Kategorifarverne (--c-fjord …) er Sommer-paletten og ændres ikke. Kopieres til apps'ene af scripts/sync-shared.mjs.
+ */
+
+:root[data-design="sommerhimmel"] {
+  --page: light-dark(#f3f0fa, #0b0e1d);
+  --page-bg:
+    radial-gradient(1100px 620px at 0% 0%, light-dark(#ffd9c6, #3b1d4c) 0%, transparent 62%),
+    radial-gradient(1000px 700px at 100% 0%, light-dark(#cfe2ff, #11305c) 0%, transparent 62%),
+    radial-gradient(900px 700px at 50% 100%, light-dark(#e4dbff, #0d3a46) 0%, transparent 62%),
+    var(--page);
+  --surface: light-dark(#ffffff, #1a1e34);
+  --surface-2: light-dark(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.07));
+  --ink: light-dark(#1b1a2e, #f3f2ff);
+  --ink-2: light-dark(#4d4a66, #c3c1de);
+  --muted: light-dark(#7d7a99, #8a88a8);
+  --grid: light-dark(rgba(27, 26, 46, 0.08), rgba(255, 255, 255, 0.08));
+  --axis: light-dark(rgba(27, 26, 46, 0.18), rgba(255, 255, 255, 0.16));
+  --border: light-dark(rgba(27, 26, 46, 0.08), rgba(255, 255, 255, 0.1));
+  --accent: light-dark(#3c5fe0, #8aa2ff);
+  --on-accent: light-dark(#ffffff, #0b0e1d);
+
+  --font-body: "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-display: "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-num: "Plus Jakarta Sans", system-ui, sans-serif;
+  --body-weight: 500;
+  --display-weight: 800;
+  --display-tracking: -0.02em;
+
+  --radius-card: 26px;
+  --radius-ctl: 999px;
+  --radius-chip: 999px;
+  --radius-img: 18px;
+  --card-bg: light-dark(rgba(255, 255, 255, 0.58), rgba(30, 34, 62, 0.55));
+  --card-border: 1px solid light-dark(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.09));
+  --card-shadow: 0 10px 30px -14px light-dark(rgba(60, 50, 120, 0.35), rgba(0, 0, 0, 0.7));
+  --card-shadow-hover: 0 20px 44px -18px light-dark(rgba(60, 50, 120, 0.5), rgba(0, 0, 0, 0.85));
+  --card-lift: -3px;
+  --card-blur: blur(20px) saturate(170%);
+  --ctl-bg: light-dark(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.07));
+  --btn-weight: 700;
+
+  --ico-family: "Font Awesome 5 Pro";
+  --ico-weight: 900;
+  --ico-before-pos: static;
+  --ico-duo: none;
+}
+
+/* ---------- Ikoner: Font Awesome Pro 5 (kun private repoer) ----------
+ * Alle ikoner skrives som <i class="ico fad fa-<navn>">. Designet vælger stilen; Sommerhimmel bruger solid (900).
+ */
+.ico.fad {
+  font-family: var(--ico-family, "Font Awesome 5 Pro");
+  font-weight: var(--ico-weight, 900);
+}
+.ico.fad::before {
+  position: var(--ico-before-pos, static);
+}
+.ico.fad::after {
+  display: var(--ico-duo, none);
+}
+
+/* ---------- Fælles grundlag for apps uden egen opsætning ----------
+ * Himlen bag siden, skriften og app-mærket. Appens egen CSS bruger tokens til kort, knapper og felter.
+ */
+:root[data-design="sommerhimmel"] body {
+  min-height: 100vh;
+  background: var(--page-bg);
+  background-attachment: fixed;
+  font-family: var(--font-body);
+  font-weight: var(--body-weight);
+}
+:root[data-design="sommerhimmel"] :is(h1, h2, h3) {
+  font-family: var(--font-display);
+  letter-spacing: var(--display-tracking);
+}
+
+/* Glaskort: <div class="glass">, eller brug tokens direkte i appens egne klasser. */
+:root[data-design="sommerhimmel"] .glass {
+  background: var(--card-bg);
+  border: var(--card-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--card-shadow);
+  -webkit-backdrop-filter: var(--card-blur);
+  backdrop-filter: var(--card-blur);
+}
+
+/* App-mærket: en farvet squircle med hvidt ikon. Sæt --app til appens farve fra paletten (fx var(--c-lyng)). */
+:root[data-design="sommerhimmel"] .app-mark {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 15px;
+  color: #fff;
+  font-size: 24px;
+  line-height: 1;
+  background: linear-gradient(150deg, color-mix(in oklab, var(--app, var(--accent)) 60%, white), var(--app, var(--accent)) 55%, color-mix(in oklab, var(--app, var(--accent)) 80%, black));
+  box-shadow: 0 8px 16px -8px color-mix(in oklab, var(--app, var(--accent)) 80%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}

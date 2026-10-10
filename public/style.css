@@ -1,24 +1,24 @@
 /* ── Reset & base ────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* Farverne kommer fra Sommer-paletten (sommer-palette.css, kopi fra summer-hub/design).
-   Her står kun appens egne navne for rollerne. Ingen hex-værdier i resten af filen. */
+/* Farverne kommer fra Sommer-paletten og udseendet fra Sommerhimmel (sommer-palette.css og sommer-ui.css, kopier fra
+   summer-hub/design). Her står kun appens egne navne for rollerne. Ingen hex-værdier i resten af filen.
+   Repoet er offentligt, så Font Awesome (Pro) må ikke bruges her: ikonerne er emojis og egne SVG'er. */
 :root {
-  --font:       Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font:       var(--font-body);
   --bg:         var(--page);
   --text:       var(--ink);
   --text-muted: var(--ink-2);
   --green:      var(--accent);                                     /* accent (hed grøn før paletten) */
   --green-dark: color-mix(in oklab, var(--accent) 82%, black);
-  --radius-sm:  8px;
-  --radius:     14px;
-  --shadow-sm:  0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
-  --shadow:     0 4px 6px -1px rgba(0,0,0,.10), 0 2px 4px -1px rgba(0,0,0,.06);
+  --radius-sm:  14px;
+  --radius:     var(--radius-card);
+  --shadow-sm:  var(--card-shadow);
+  --shadow:     var(--card-shadow-hover);
 }
 
 body {
   font-family: var(--font);
-  background:  var(--bg);
   color:       var(--text);
   min-height:  100vh;
   padding:     28px 16px 56px;
@@ -38,8 +38,13 @@ body {
 
 /* ── Header ──────────────────────────────────────────────────────────────── */
 header {
-  padding-bottom: 18px;
-  border-bottom:  3px solid var(--green);
+  padding:       10px 14px 10px 10px;
+  border-radius: 22px;
+  background:    var(--card-bg);
+  border:        var(--card-border);
+  box-shadow:    var(--card-shadow);
+  -webkit-backdrop-filter: var(--card-blur);
+  backdrop-filter: var(--card-blur);
 }
 
 .header-left {
@@ -55,10 +60,10 @@ header {
   flex:          none;
   width:         52px;
   height:        52px;
-  border-radius: 14px;
-  background:    var(--tint-havgraes);
-  box-shadow:    inset 0 -3px 0 var(--c-havgraes);
-  font-size:     1.9rem;
+  border-radius: 15px;
+  background:    linear-gradient(150deg, color-mix(in oklab, var(--c-havgraes) 60%, white), var(--c-havgraes) 55%, color-mix(in oklab, var(--c-havgraes) 80%, black));
+  box-shadow:    0 8px 16px -8px color-mix(in oklab, var(--c-havgraes) 80%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  font-size:     1.7rem;
   line-height:   1;
   user-select:   none;
 }
@@ -78,11 +83,13 @@ h1 {
 
 /* ── Card ────────────────────────────────────────────────────────────────── */
 .card {
-  background:    var(--surface);
+  background:    var(--card-bg);
   border-radius: var(--radius);
   box-shadow:    var(--shadow-sm);
-  padding:       20px;
-  border:        1px solid var(--grid);
+  padding:       20px 22px;
+  border:        var(--card-border);
+  -webkit-backdrop-filter: var(--card-blur);
+  backdrop-filter: var(--card-blur);
 }
 
 /* ── Search ──────────────────────────────────────────────────────────────── */
@@ -113,12 +120,12 @@ h1 {
 #search-input {
   width:         100%;
   padding:       13px 14px 13px 44px;
-  border:        1.5px solid var(--grid);
-  border-radius: var(--radius-sm);
+  border:        1.5px solid var(--border);
+  border-radius: var(--radius-ctl);
   font-size:     1rem;
   font-family:   var(--font);
   color:         var(--text);
-  background:    var(--surface-2);
+  background:    var(--ctl-bg);
   outline:       none;
   transition:    border-color 0.15s, box-shadow 0.15s, background 0.15s;
 }
@@ -236,10 +243,12 @@ h1 {
 }
 
 .events-card {
-  background:    var(--surface);
-  border-radius: var(--radius);
+  background:    var(--card-bg);
+  border-radius: 22px;
   box-shadow:    var(--shadow-sm);
-  border:        1px solid var(--grid);
+  border:        var(--card-border);
+  -webkit-backdrop-filter: var(--card-blur);
+  backdrop-filter: var(--card-blur);
   overflow:      hidden;
 }
 
@@ -334,10 +343,10 @@ h1 {
   align-items:     center;
   gap:             8px;
   padding:         10px 20px;
-  border-radius:   var(--radius-sm);
+  border-radius:   var(--radius-ctl);
   font-family:     var(--font);
   font-size:       0.9375rem;
-  font-weight:     600;
+  font-weight:     var(--btn-weight);
   cursor:          pointer;
   text-decoration: none;
   border:          none;
@@ -347,9 +356,9 @@ h1 {
 .btn:active { transform: translateY(1px); }
 
 .btn-ghost {
-  background: transparent;
+  background: var(--ctl-bg);
   color:      var(--text-muted);
-  border:     1.5px solid var(--grid);
+  border:     1.5px solid var(--border);
 }
 .btn-ghost:hover {
   background:   var(--surface);
@@ -358,13 +367,12 @@ h1 {
 }
 
 .btn-primary {
-  background:  var(--green);
+  background:  linear-gradient(135deg, color-mix(in oklab, var(--accent) 65%, white), var(--accent));
   color:       var(--on-accent);
-  box-shadow:  0 2px 4px color-mix(in oklab, var(--accent) 30%, transparent);
+  box-shadow:  0 10px 22px -10px color-mix(in oklab, var(--accent) 85%, transparent);
 }
 .btn-primary:hover {
-  background:  var(--green-dark);
-  box-shadow:  0 4px 8px color-mix(in oklab, var(--accent) 35%, transparent);
+  filter:      brightness(1.06);
 }
 
 .btn-secondary {
@@ -442,8 +450,8 @@ h1 {
   gap:           8px 16px;
   margin-top:    16px;
   padding:       10px 14px;
-  border-radius: 10px;
+  border-radius: 18px;
   border:        1px solid var(--warning);
-  background:    color-mix(in oklab, var(--warning) 12%, var(--surface));
+  background:    color-mix(in oklab, var(--warning) 12%, var(--card-bg));
   font-size:     0.9rem;
 }

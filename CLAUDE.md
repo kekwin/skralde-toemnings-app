@@ -40,14 +40,14 @@ npm run dev            # genbygger siderne ved ændringer
 - `backend/app.ts`: Express-appen med ruterne `/api/saved-address`, `/api/home`, `/api/home/dates`, `/api/search`,
   `/api/set-address` (POST), `/api/dates` og `/api/calendar.ics`. `backend/server.ts` læser miljøet og starter den.
 - `shared/`: `waste-types.ts` (ikon og farver pr. affaldstype, bruges af serveren og begge sider) og `types.ts`.
-- `src/main.ts` (hovedsiden) og `src/print.ts` (udskriftssiden); `public/`: HTML, CSS og paletten, kopieres til
+- `src/main.ts` (hovedsiden) og `src/print.ts` (udskriftssiden); `public/`: HTML, CSS, paletten, udseendet (`sommer-ui.css`, Sommerhimmel) og skrifterne (kopier fra hub'ens `design/`; ingen Font Awesome, fordi repoet er offentligt), kopieres til
   `dist/` ved build.
 - Tests ligger ved siden af koden (`*.test.ts`, Vitest).
 - Port 3000 (127.0.0.1) i hub'en, på Tailscale som `waste-collection-dates`.
 
 ## Status
 
-v2.0.2 kører i hub'en (8. oktober 2026: `/health`; 7. oktober 2026: omskrevet til TypeScript `strict` med Express 5 og indbygget `fetch`, uændret funktion og uændret API) på http://127.0.0.1:3000 og https://waste-collection-dates.tailcc94cc.ts.net.
+v2.1.0 kører i hub'en (10. oktober 2026: Sommerhimmel i lys version, det fælles udseende fra `summer-hub/design/sommer-ui.css`: glaskort, toppen som glasbjælke, runde knapper; ingen Font Awesome, fordi repoet er offentligt; 8. oktober 2026: `/health`; 7. oktober 2026: omskrevet til TypeScript `strict` med Express 5 og indbygget `fetch`, uændret funktion og uændret API) på http://127.0.0.1:3000 og https://waste-collection-dates.tailcc94cc.ts.net.
 Henter datoer igen med ny session, når Vestfor svarer med en tom liste (v1.4.2).
 
 ## Næste skridt
