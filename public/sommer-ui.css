@@ -105,3 +105,114 @@
   background: linear-gradient(150deg, color-mix(in oklab, var(--app, var(--accent)) 60%, white), var(--app, var(--accent)) 55%, color-mix(in oklab, var(--app, var(--accent)) 80%, black));
   box-shadow: 0 8px 16px -8px color-mix(in oklab, var(--app, var(--accent)) 80%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.45);
 }
+
+/* ---------- Fælles ramme og topmenu (Strøm er pejlemærket, 10. oktober 2026) ----------
+ * Alle apps med en menu bruger samme glasbjælke og sidebredde: <div class="sh-shell"><header class="sh-bar">
+ * <h1 class="sh-brand"><span class="app-mark">…</span>Navn</h1><nav class="sh-nav"><a aria-current="page">…</a></nav></header>…</div>.
+ * Menuen har egne farvetokens (--sh-*), fordi økonomi-appens shadcn-tokens overskriver --accent og --border med HSL-tal.
+ * Siden vokser op til 1560 px og er responsiv under det. Menupunkter har ingen ikoner. Et andet niveau (fx
+ * Økonomi: Kewins sider) er en <nav class="sh-sub"> inde i bjælken. Gruppeskel: <span class="sh-sep">.
+ */
+:root[data-design="sommerhimmel"] {
+  --sh-active: light-dark(#3c5fe0, #8aa2ff);
+  --sh-active-ink: light-dark(#ffffff, #0b0e1d);
+  --sh-line: light-dark(rgba(27, 26, 46, 0.08), rgba(255, 255, 255, 0.1));
+}
+:root[data-design="sommerhimmel"] .sh-shell {
+  max-width: 1560px;
+  margin: 0 auto;
+  padding: 0 clamp(16px, 3vw, 56px) 64px;
+}
+:root[data-design="sommerhimmel"] .sh-bar {
+  position: sticky;
+  top: 10px;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 24px;
+  margin: 12px 0 16px;
+  padding: 8px 10px 8px 12px;
+  border-radius: 22px;
+  background: var(--card-bg);
+  border: var(--card-border);
+  box-shadow: var(--card-shadow);
+  -webkit-backdrop-filter: var(--card-blur);
+  backdrop-filter: var(--card-blur);
+}
+:root[data-design="sommerhimmel"] .sh-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font-size: 20px;
+  font-weight: var(--display-weight);
+  color: var(--ink);
+  text-decoration: none;
+}
+:root[data-design="sommerhimmel"] .sh-brand .app-mark {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  font-size: 19px;
+}
+:root[data-design="sommerhimmel"] .sh-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+:root[data-design="sommerhimmel"] .sh-nav a {
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-weight: 600;
+  color: var(--ink-2);
+  text-decoration: none;
+}
+:root[data-design="sommerhimmel"] .sh-nav a:hover {
+  background: var(--ctl-bg);
+  color: var(--ink);
+}
+:root[data-design="sommerhimmel"] .sh-nav a:is([aria-current="page"], .active),
+:root[data-design="sommerhimmel"] .sh-nav a:is([aria-current="page"], .active):hover {
+  background: var(--sh-active);
+  color: var(--sh-active-ink);
+  font-weight: 700;
+}
+:root[data-design="sommerhimmel"] .sh-sep {
+  width: 1px;
+  height: 24px;
+  margin: 0 6px;
+  background: var(--sh-line);
+}
+:root[data-design="sommerhimmel"] .sh-sub {
+  flex-basis: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 6px 4px 2px;
+  border-top: 1px solid var(--sh-line);
+}
+:root[data-design="sommerhimmel"] .sh-sub a {
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-2);
+  text-decoration: none;
+}
+:root[data-design="sommerhimmel"] .sh-sub a:hover {
+  background: var(--ctl-bg);
+  color: var(--ink);
+}
+:root[data-design="sommerhimmel"] .sh-sub a:is([aria-current="page"], .active),
+:root[data-design="sommerhimmel"] .sh-sub a:is([aria-current="page"], .active):hover {
+  background: color-mix(in oklab, var(--sh-active) 14%, transparent);
+  color: var(--ink);
+  font-weight: 700;
+}
+@media (max-width: 699px) {
+  :root[data-design="sommerhimmel"] .sh-bar {
+    top: 6px;
+  }
+}
