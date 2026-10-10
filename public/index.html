@@ -4,9 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Skraldetømning</title>
-  <!-- App-mærket som favicon: 🗑️ på havgræs, som på hub'ens forside -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%23e0f1eb'/><text x='50' y='56' font-size='68' text-anchor='middle' dominant-baseline='middle'>🗑️</text></svg>" />
+  <!-- App-mærket som favicon: skraldespand på havgræs (Font Awesome Free, scripts/app-icon.mjs --free i hub'en) -->
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
   <link rel="stylesheet" href="fonts/fonts.css" />
+  <!-- Font Awesome Free (CC BY 4.0); repoet er offentligt, så aldrig Pro -->
+  <link rel="stylesheet" href="fontawesome-free/fontawesome-free.css" />
   <link rel="stylesheet" href="sommer-palette.css" />
   <link rel="stylesheet" href="sommer-ui.css" />
   <link rel="stylesheet" href="style.css" />
@@ -17,7 +20,7 @@
     <!-- ── Header ── -->
     <header>
       <div class="header-left">
-        <span class="header-icon" aria-hidden="true">🗑️</span>
+        <span class="header-icon" aria-hidden="true"><i class="ico fad fa-trash-alt"></i></span>
         <div>
           <h1>Skraldetømning</h1>
           <p id="current-address" class="header-subtitle">Klar til søgning&hellip;</p>
@@ -28,7 +31,7 @@
     <!-- ── Anden adresse end hjemmet (HOME_ADDRESS) ── -->
     <div class="home-banner hidden" id="home-banner">
       <span>Du kigger på en anden adresse end hjemmet. Forsiden viser stadig hjemmet.</span>
-      <button id="home-btn" class="btn btn-ghost" type="button">🏠 Tilbage til <span id="home-name"></span></button>
+      <button id="home-btn" class="btn btn-ghost" type="button"><i class="ico fad fa-home" aria-hidden="true"></i> Tilbage til <span id="home-name"></span></button>
     </div>
 
     <!-- ── Action bar (shown when dates are visible) ── -->
@@ -110,7 +113,7 @@
 
     <!-- ── Error ── -->
     <div id="error-msg" class="error-card hidden" role="alert">
-      <span class="error-icon" aria-hidden="true">⚠️</span>
+      <i class="error-icon ico fad fa-exclamation-triangle" aria-hidden="true"></i>
       <span id="error-text"></span>
       <button id="retry-btn" class="btn-link">Prøv igen</button>
     </div>

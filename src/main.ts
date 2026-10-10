@@ -89,7 +89,10 @@ const showDatesView = () => {
   if (currentAddress) {
     const postnr = currentAddress.postnr ? `, ${currentAddress.postnr}` : "";
     const atHome = !!homeAddress && currentAddress.id === homeAddress.id;
-    headerSubtitle.textContent = `${atHome ? "🏠" : "📍"} ${currentAddress.navn || ""}${postnr}${atHome ? " (hjemme)" : ""}`;
+    const pin = document.createElement("i");
+    pin.className = `ico fad fa-${atHome ? "home" : "map-marker-alt"}`;
+    pin.setAttribute("aria-hidden", "true");
+    headerSubtitle.replaceChildren(pin, ` ${currentAddress.navn || ""}${postnr}${atHome ? " (hjemme)" : ""}`);
     homeBanner.classList.toggle("hidden", !homeAddress || atHome);
     if (homeAddress) homeName.textContent = (homeAddress.navn ?? "").replace(/, \d{4} .*$/, "");
   }
@@ -147,7 +150,7 @@ const renderDates = (dates: WasteDateWithIcon[]) => {
       <div class="events-card">`;
 
     for (const ev of events) {
-      const { icon, cls } = wasteType(ev.title);
+      const { fa, cls } = wasteType(ev.title);
       const d = parseLocalDate(ev.start);
       const dayShort = DAYS_SHORT[d.getDay()] ?? "";
       const dayNum = d.getDate();
@@ -160,7 +163,7 @@ const renderDates = (dates: WasteDateWithIcon[]) => {
           <span class="event-daynum">${dayNum}.</span>
         </div>
         <div class="event-badge">
-          <span class="event-icon" aria-hidden="true">${icon}</span>
+          <i class="event-icon ico fad fa-${fa}" aria-hidden="true"></i>
           <span class="event-title">${escapeHtml(ev.title)}</span>
         </div>
         ${urgHtml}
@@ -219,7 +222,7 @@ const renderAutocomplete = (results: VestforAddress[]) => {
          data-id="${escapeHtml(r.Id)}"
          data-navn="${escapeHtml(r.FuldtVejnavn)}"
          data-postnr="${escapeHtml(r.Postnr || "")}">
-      <span class="ac-icon" aria-hidden="true">📍</span>
+      <i class="ac-icon ico fad fa-map-marker-alt" aria-hidden="true"></i>
       <span class="ac-name">${escapeHtml(r.FuldtVejnavn)}</span>
       ${r.Postnr ? `<span class="ac-postnr">${escapeHtml(r.Postnr)}</span>` : ""}
     </div>

@@ -1,39 +1,12 @@
 /*
- * Skrifter til Familien Sommer hub: variable woff2-filer (kun latin, som dækker æ, ø og å) fra Fontsource.
- * Alle er under SIL Open Font License (licenser/). Kopieres til apps'ene af scripts/sync-shared.mjs.
+ * Skriften til Familien Sommer hub (Sommerhimmel): Plus Jakarta Sans som variabel woff2-fil (kun latin, som dækker
+ * æ, ø og å) fra Fontsource, under SIL Open Font License (licenser/). Kopieres til apps'ene af scripts/sync-shared.mjs.
+ * De skrifter, de andre designforslag brugte, er beskrevet i docs/design-arkiv/README.md.
  */
-@font-face {
-  font-family: "Figtree";
-  font-style: normal;
-  font-weight: 300 900;
-  font-display: swap;
-  src: url(figtree.woff2) format("woff2");
-}
-@font-face {
-  font-family: "Nunito";
-  font-style: normal;
-  font-weight: 200 1000;
-  font-display: swap;
-  src: url(nunito.woff2) format("woff2");
-}
-@font-face {
-  font-family: "Inter";
-  font-style: normal;
-  font-weight: 100 900;
-  font-display: swap;
-  src: url(inter.woff2) format("woff2");
-}
 @font-face {
   font-family: "Plus Jakarta Sans";
   font-style: normal;
   font-weight: 200 800;
   font-display: swap;
   src: url(plus-jakarta-sans.woff2) format("woff2");
-}
-@font-face {
-  font-family: "Fraunces";
-  font-style: normal;
-  font-weight: 100 900;
-  font-display: swap;
-  src: url(fraunces.woff2) format("woff2");
 }

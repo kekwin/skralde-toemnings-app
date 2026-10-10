@@ -3,7 +3,11 @@
 
 /* Farverne kommer fra Sommer-paletten og udseendet fra Sommerhimmel (sommer-palette.css og sommer-ui.css, kopier fra
    summer-hub/design). Her står kun appens egne navne for rollerne. Ingen hex-værdier i resten af filen.
-   Repoet er offentligt, så Font Awesome (Pro) må ikke bruges her: ikonerne er emojis og egne SVG'er. */
+   Repoet er offentligt, så Font Awesome Pro må ikke bruges her: ikonerne er Font Awesome Free (CC BY 4.0,
+   fontawesome-free/, kopi fra summer-hub/design/fontawesome-free) og egne SVG'er. */
+:root[data-design="sommerhimmel"] {
+  --ico-family: "Font Awesome 5 Free";
+}
 :root {
   --font:       var(--font-body);
   --bg:         var(--page);
@@ -63,7 +67,8 @@ header {
   border-radius: 15px;
   background:    linear-gradient(150deg, color-mix(in oklab, var(--c-havgraes) 60%, white), var(--c-havgraes) 55%, color-mix(in oklab, var(--c-havgraes) 80%, black));
   box-shadow:    0 8px 16px -8px color-mix(in oklab, var(--c-havgraes) 80%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.45);
-  font-size:     1.7rem;
+  color:         #fff;
+  font-size:     1.45rem;
   line-height:   1;
   user-select:   none;
 }
@@ -165,7 +170,8 @@ h1 {
 .autocomplete-item:hover,
 .autocomplete-item:focus       { background: var(--tint-fjord); outline: none; }
 
-.ac-icon   { font-size: 1rem; flex-shrink: 0; }
+.ac-icon   { font-size: 0.95rem; flex-shrink: 0; color: var(--muted); width: 1.1em; text-align: center; }
+.header-subtitle .ico { color: var(--muted); margin-right: 2px; }
 .ac-name   { flex: 1; font-size: 0.9375rem; color: var(--text); }
 .ac-postnr {
   font-size:     0.8125rem;
@@ -212,7 +218,7 @@ h1 {
   color:         var(--ink);
 }
 
-.error-icon { font-size: 1.1rem; flex-shrink: 0; }
+.error-icon { font-size: 1.05rem; flex-shrink: 0; color: var(--critical); }
 
 .btn-link {
   background:  none;
@@ -305,7 +311,7 @@ h1 {
   color:         var(--ink);
   flex-shrink:   0;
 }
-.event-icon { font-size: 0.9375rem; }
+.event-icon { font-size: 0.85rem; width: 1.1em; text-align: center; color: var(--row-color); }
 
 /* Urgency pill */
 .urgent {
@@ -389,55 +395,55 @@ h1 {
 /* Waste-type colours (left border + badge background/text)                  */
 /* ══════════════════════════════════════════════════════════════════════════ */
 
-/* 🗑️  Dagrenovation */
+/* Dagrenovation */
 .type-dagrenov                      { --row-color: var(--muted); }
 .type-dagrenov .event-badge         { --badge-bg: var(--surface-2); }
 
-/* 📄  Papir */
+/* Papir */
 .type-papir                         { --row-color: var(--c-fjord); }
 .type-papir .event-badge            { --badge-bg: var(--tint-fjord); }
 
-/* 📦  Pap (karton) */
+/* Pap (karton) */
 .type-pap                           { --row-color: var(--c-solsikke); }
 .type-pap .event-badge              { --badge-bg: var(--tint-solsikke); }
 
-/* 🍾  Glas */
+/* Glas */
 .type-glas                          { --row-color: var(--c-havgraes); }
 .type-glas .event-badge             { --badge-bg: var(--tint-havgraes); }
 
-/* ♻️  Plast + Metal (combined) */
+/* Plast + Metal (combined) */
 .type-plast-metal                   { --row-color: var(--c-lyng); }
 .type-plast-metal .event-badge      { --badge-bg: var(--tint-lyng); }
 
-/* ♻️  Plast */
+/* Plast */
 .type-plast                         { --row-color: var(--c-lyng); }
 .type-plast .event-badge            { --badge-bg: var(--tint-lyng); }
 
-/* 🔩  Metal */
+/* Metal */
 .type-metal                         { --row-color: var(--c-koral); }
 .type-metal .event-badge            { --badge-bg: var(--tint-koral); }
 
-/* 🌿  Haveaffald */
+/* Haveaffald */
 .type-have                          { --row-color: var(--c-eng); }
 .type-have .event-badge             { --badge-bg: var(--tint-eng); }
 
-/* 🍃  Madaffald */
+/* Madaffald */
 .type-mad                           { --row-color: var(--c-eng); }
 .type-mad .event-badge              { --badge-bg: var(--tint-eng); }
 
-/* ⚫  Restaffald */
+/* Restaffald */
 .type-rest                          { --row-color: var(--ink-2); }
 .type-rest .event-badge             { --badge-bg: var(--surface-2); }
 
-/* 📦  Storskrald */
+/* Storskrald */
 .type-stor                          { --row-color: var(--c-lavendel); }
 .type-stor .event-badge             { --badge-bg: var(--tint-lavendel); }
 
-/* ⚠️  Farligt affald */
+/* Farligt affald */
 .type-farlig                        { --row-color: var(--c-hyben); }
 .type-farlig .event-badge           { --badge-bg: var(--tint-hyben); }
 
-/* 🗓️  Ukendt type */
+/* Ukendt type */
 .type-default                       { --row-color: var(--axis); }
 .type-default .event-badge          { --badge-bg: var(--surface-2); }
 

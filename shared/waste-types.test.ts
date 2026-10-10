@@ -22,4 +22,10 @@ describe("wasteType", () => {
     expect(wasteType(undefined).cls).toBe("type-default");
     expect(wasteType(null).icon).toBe("🗓️");
   });
+
+  it("hver type har et Font Awesome Free-ikon til siderne", () => {
+    expect(wasteType("Haveaffald").fa).toBe("leaf");
+    expect(wasteType("Papir/Plast & MDK").fa).toBe("newspaper");
+    expect(wasteType("Noget nyt").fa).toBe("calendar-alt");
+  });
 });

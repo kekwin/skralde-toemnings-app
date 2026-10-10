@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Skraldetømning – udskriv</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <!-- Font Awesome Free (CC BY 4.0); repoet er offentligt, så aldrig Pro -->
+  <link rel="stylesheet" href="fontawesome-free/fontawesome-free.css" />
   <style>
     /* ── Reset ─────────────────────────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -168,7 +171,7 @@
   <div id="content" style="display:none">
     <div class="print-header">
       <div>
-        <div class="header-brand">🗑️ Skraldetømning</div>
+        <div class="header-brand"><i class="fas fa-trash-alt" aria-hidden="true"></i> Skraldetømning</div>
         <div id="header-addr" class="header-addr"></div>
       </div>
       <div id="header-meta" class="header-meta"></div>
@@ -179,7 +182,7 @@
     <div id="print-footer" class="print-footer"></div>
   </div>
 
-  <button class="print-hint" onclick="window.print()">🖨️&nbsp; Udskriv / Gem som PDF</button>
+  <button class="print-hint" onclick="window.print()"><i class="fas fa-print" aria-hidden="true"></i>&nbsp; Udskriv / Gem som PDF</button>
 
   <script src="print.js" type="module"></script>
 </body>

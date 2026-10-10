@@ -2,7 +2,7 @@
 
 Lille Node-app (TypeScript `strict`, Express) der henter tømmedatoer fra Vestfor for det kommende år og viser dem i et
 overskueligt interface. Kan downloade en kalenderfil (.ics) og printe som pdf. Repo:
-https://github.com/kekwin/waste-collection-dates (privat). Tal med Kewin på dansk. Push direkte til `main`; kør
+https://github.com/kekwin/waste-collection-dates (**offentligt**). Tal med Kewin på dansk. Push direkte til `main`; kør
 `npm run check` før push. Hub'en bygger fra et versionstag.
 
 Fælles regler for alle apps (principper, skabelon til denne fil, git): [summer-hub/CLAUDE.md](https://github.com/kekwin/summer-hub/blob/main/CLAUDE.md).
@@ -15,6 +15,9 @@ Fælles regler for alle apps (principper, skabelon til denne fil, git): [summer-
   hos Vestfor, så hjemmet og den viste adresse ikke blander sig. Uden `HOME_ADDRESS` virker appen som før.
 - Kalenderfilen (`/api/calendar.ics`): events kl. 06:00–06:30 på tømmedagen (Europe/Copenhagen), markeret som
   ledig tid, påmindelse kl. 20:30 aftenen før, og RFC-5545-kompatible UID'er (uden fx `/`) for Outlook-import.
+- **Repoet er offentligt: aldrig Font Awesome Pro** (Kewins licens gælder kun private repoer), heller ikke som SVG
+  eller under et andet navn. Ikonerne er Font Awesome Free (CC BY 4.0) i `public/fontawesome-free/`, kopi fra
+  `summer-hub/design/fontawesome-free` (Kewins valg, 10. oktober 2026). Tjek, at et ikon findes i Free, før det bruges.
 - Forsiden og påmindelserne bruger appens API (`/api/home/dates`, `/api/dates` med ikoner). Ændr ikke formatet
   uden at ændre `summer-frontpage`.
 
@@ -39,15 +42,15 @@ npm run dev            # genbygger siderne ved ændringer
 - `backend/ics.ts`: kalenderfilen (events, RFC-5545-folding og UID'er).
 - `backend/app.ts`: Express-appen med ruterne `/api/saved-address`, `/api/home`, `/api/home/dates`, `/api/search`,
   `/api/set-address` (POST), `/api/dates` og `/api/calendar.ics`. `backend/server.ts` læser miljøet og starter den.
-- `shared/`: `waste-types.ts` (ikon og farver pr. affaldstype, bruges af serveren og begge sider) og `types.ts`.
-- `src/main.ts` (hovedsiden) og `src/print.ts` (udskriftssiden); `public/`: HTML, CSS, paletten, udseendet (`sommer-ui.css`, Sommerhimmel) og skrifterne (kopier fra hub'ens `design/`; ingen Font Awesome, fordi repoet er offentligt), kopieres til
+- `shared/`: `waste-types.ts` (emoji til kalenderen og API'et, Font Awesome-ikon til siderne og farver pr. affaldstype, bruges af serveren og begge sider) og `types.ts`.
+- `src/main.ts` (hovedsiden) og `src/print.ts` (udskriftssiden); `public/`: HTML, CSS, paletten, udseendet (`sommer-ui.css`, Sommerhimmel), skrifterne og Font Awesome Free (kopier fra hub'ens `design/`), kopieres til
   `dist/` ved build.
 - Tests ligger ved siden af koden (`*.test.ts`, Vitest).
 - Port 3000 (127.0.0.1) i hub'en, på Tailscale som `waste-collection-dates`.
 
 ## Status
 
-v2.1.0 kører i hub'en (10. oktober 2026: Sommerhimmel i lys version, det fælles udseende fra `summer-hub/design/sommer-ui.css`: glaskort, toppen som glasbjælke, runde knapper; ingen Font Awesome, fordi repoet er offentligt; 8. oktober 2026: `/health`; 7. oktober 2026: omskrevet til TypeScript `strict` med Express 5 og indbygget `fetch`, uændret funktion og uændret API) på http://127.0.0.1:3000 og https://waste-collection-dates.tailcc94cc.ts.net.
+v2.2.0 kører i hub'en (10. oktober 2026: Font Awesome Free-ikoner i stedet for emojis på siderne (affaldstyper, adresse, fejl, udskrift), nyt favicon og hjemmeskærmsikon; samme dag: Sommerhimmel i lys version, det fælles udseende fra `summer-hub/design/sommer-ui.css`: glaskort, toppen som glasbjælke, runde knapper; 8. oktober 2026: `/health`; 7. oktober 2026: omskrevet til TypeScript `strict` med Express 5 og indbygget `fetch`, uændret funktion og uændret API) på http://127.0.0.1:3000 og https://waste-collection-dates.tailcc94cc.ts.net.
 Henter datoer igen med ny session, når Vestfor svarer med en tom liste (v1.4.2).
 
 ## Næste skridt

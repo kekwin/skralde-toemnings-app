@@ -51,7 +51,7 @@ const render = async () => {
     const future = new Date(now);
     future.setFullYear(future.getFullYear() + 1);
 
-    txt($("header-addr"), "📍 " + addrLabel);
+    txt($("header-addr"), addrLabel);
 
     $("header-meta").innerHTML =
       "Udskrevet: " + dateLabel(now) + "<br>" + "Periode: " + dateLabel(now) + " – " + dateLabel(future) + "<br>" + "Kilde: vestfor.dk";
@@ -102,9 +102,9 @@ const render = async () => {
         badge.style.background = wt.bg;
         badge.style.color = wt.fg;
 
-        const iconSpan = document.createElement("span");
+        const iconSpan = document.createElement("i");
+        iconSpan.className = `fas fa-${wt.fa}`;
         iconSpan.setAttribute("aria-hidden", "true");
-        txt(iconSpan, wt.icon);
 
         const titleSpan = document.createElement("span");
         txt(titleSpan, ev.title);
